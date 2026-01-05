@@ -11,10 +11,11 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@CrossOrigin(origins = {"http://localhost:8081"}, allowCredentials = "true")
 public class UserController {
     UserService userService;
 
-    @PostMapping("/splitra/users")
+       @PostMapping("/splitra/users")
     public ResponseEntity<UserDto> createUser (@RequestBody UserDto userDto) {
         return userService.createUser(userDto);
     }
