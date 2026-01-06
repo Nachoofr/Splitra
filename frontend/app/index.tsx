@@ -1,12 +1,16 @@
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
 import "./global.css";
- 
-export default function App() {
+
+const home = () => {
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl font-bold text-blue-500">
-        Welcome to Native
-      </Text>
+    <View>
+      <Text className="text-center">homeafdasfasdfsfs</Text>
+      <Text>asdfasdfadsfasdfasdfasfasasf </Text>
     </View>
   );
-}
+};
+
+export default home;
+
+const styles = StyleSheet.create({});
