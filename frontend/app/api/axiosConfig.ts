@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Your backend base URL - no /api at the end since your endpoint is /splitra/users
-const API_BASE_URL = 'http://10.5.4.129:8080';
+const API_BASE_URL = 'http://192.168.1.72:8080';
 
 const AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
