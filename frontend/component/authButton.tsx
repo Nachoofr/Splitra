@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Pressable } from "react-native";
 
-const authButton = ({ className = "", ...props }) => {
+const AuthButton = ({ className = "", ...props }) => {
   return (
     <>
       <Pressable
@@ -13,4 +13,4 @@ const authButton = ({ className = "", ...props }) => {
   );
 };
 
-export default authButton;
+export default AuthButton;

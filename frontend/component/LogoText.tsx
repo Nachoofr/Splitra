@@ -4,7 +4,7 @@ import Logo from "../assets/img/logo.png";
 
 const LogoText = ({ ...props }) => {
   return (
-    <View className="ww-44 h-40 flex-row items-center justify-center mt-20">
+    <View className="ww-44 h-40 flex-row items-center justify-center">
       <Image
         className="w-14 h-100 relative pr-5"
         resizeMode="contain"

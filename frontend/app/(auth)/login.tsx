@@ -1,21 +1,15 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TextInput,
-  Pressable,
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import LogoText from "../../component/LogoText";
 import AuthTextInput from "../../component/authTextInput";
 import AuthButton from "../../component/authButton";
 import AuthSecondaryButton from "../../component/authSecondaryButton";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const login = () => {
   return (
-    <View>
-      <View className="flex-auto items-center justify-center">
+    <SafeAreaView>
+      <View className="flex-auto items-center justify-center mt-10">
         <LogoText />
         <View className="w-56 mt-7">
           <Text className="text-center text-primary text-4xl font-bold ">
@@ -47,7 +41,7 @@ const login = () => {
           Don't have an account?
         </Text>
 
-        <AuthSecondaryButton>
+        <AuthSecondaryButton href="/signup">
           <Text className="text-primary text-xl font-normal mt-2 text-center p-5">
             Sign Up
           </Text>
@@ -57,13 +51,13 @@ const login = () => {
           Forgot your password?
         </Text>
 
-        <AuthSecondaryButton className="w-40">
+        <AuthSecondaryButton href="/reset-password" className="w-40">
           <Text className="text-primary text-xl font-normal mt-2 text-center p-5">
             Reset Password
           </Text>
         </AuthSecondaryButton>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

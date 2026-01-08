@@ -2,7 +2,7 @@ import { View } from "react-native";
 import React from "react";
 import { TextInput } from "react-native";
 
-const authTextInput = ({ ...props }) => {
+const AuthTextInput = ({ ...props }) => {
   return (
     <>
       <TextInput
@@ -13,4 +13,4 @@ const authTextInput = ({ ...props }) => {
   );
 };
 
-export default authTextInput;
+export default AuthTextInput;

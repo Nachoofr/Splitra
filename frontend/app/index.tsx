@@ -1,14 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import "./global.css";
-import Login from "./(auth)/login";
+import { Redirect } from "expo-router";
 
-const home = () => {
-  return (
-    <View>
-      <Login />
-    </View>
-  );
+const Home = () => {
+  return <Redirect href="/login" />;
 };
 
-export default home;
+export default Home;
