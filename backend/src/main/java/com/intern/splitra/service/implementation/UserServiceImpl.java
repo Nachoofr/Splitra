@@ -4,12 +4,16 @@ import com.intern.splitra.dto.UserDto;
 import com.intern.splitra.mapper.UserMapper;
 import com.intern.splitra.model.User;
 import com.intern.splitra.repository.UserRepo;
+import com.intern.splitra.service.SecurityService.JwtService;
 import com.intern.splitra.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,12 +22,16 @@ import java.util.Optional;
 @AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
+    private JwtService jwtService;
+    AuthenticationManager authManager;
     UserMapper userMapper;
     UserRepo userRepo;
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public ResponseEntity<UserDto> createUser(UserDto userDto) {
         var user = userMapper.toEntity(userDto);
         user.setActive(true);
+        user.setPassword(encoder.encode(user.getPassword()));
         userRepo.save(user);
         return new ResponseEntity<>(userMapper.toDto(user), HttpStatus.OK);
     }
@@ -64,6 +72,23 @@ public class UserServiceImpl implements UserService {
         user.setActive(false);
         userRepo.save(user);
         return new ResponseEntity<>(userMapper.toDto(user), HttpStatus.OK);
+    }
+
+        public ResponseEntity<String> verify(User user) {
+        try {
+            Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+            );
+
+            if (authentication.isAuthenticated()) {
+                String token = jwtService.generateToken(user.getEmail());
+                return ResponseEntity.ok(token);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("fail");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("fail");
+        }
     }
 
 

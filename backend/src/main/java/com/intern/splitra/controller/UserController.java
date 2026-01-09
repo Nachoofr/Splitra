@@ -1,6 +1,7 @@
 package com.intern.splitra.controller;
 
 import com.intern.splitra.dto.UserDto;
+import com.intern.splitra.model.User;
 import com.intern.splitra.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,14 @@ import java.util.List;
 public class UserController {
     UserService userService;
 
-       @PostMapping("/splitra/users")
+       @PostMapping("/splitra/users/signup")
     public ResponseEntity<UserDto> createUser (@RequestBody UserDto userDto) {
         return userService.createUser(userDto);
+    }
+
+    @PostMapping("splitra/users/login")
+    public ResponseEntity<String>login(@RequestBody User user){
+        return userService.verify(user);
     }
 
     @GetMapping("/splitra/users")
