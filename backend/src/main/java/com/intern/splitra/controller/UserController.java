@@ -1,5 +1,6 @@
 package com.intern.splitra.controller;
 
+import com.intern.splitra.constant.UserApiEndpointConstants;
 import com.intern.splitra.dto.UserDto;
 import com.intern.splitra.model.User;
 import com.intern.splitra.service.UserService;
@@ -16,38 +17,35 @@ import java.util.List;
 public class UserController {
     UserService userService;
 
-       @PostMapping("/splitra/users/signup")
+    @PostMapping(UserApiEndpointConstants.SIGN_UP)
     public ResponseEntity<UserDto> createUser (@RequestBody UserDto userDto) {
         return userService.createUser(userDto);
     }
 
-    @PostMapping("splitra/users/login")
+    @PostMapping(UserApiEndpointConstants.LOGIN)
     public ResponseEntity<String>login(@RequestBody User user){
         return userService.verify(user);
     }
 
-    @GetMapping("/splitra/users")
+    @GetMapping(UserApiEndpointConstants.USERS)
     public ResponseEntity<List<UserDto>> getAllUsers(){
         var users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/splitra/users/{id}")
+    @GetMapping(UserApiEndpointConstants.USER_ID)
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id){
         return userService.getUserById(id);
     }
 
-    @PostMapping("/splitra/users/{id}")
+    @PostMapping(UserApiEndpointConstants.USER_ID)
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto){
         return userService.updateUser(userDto, id);
     }
 
-    @DeleteMapping("/splitra/users/{id}")
+    @DeleteMapping(UserApiEndpointConstants.USER_ID)
     public ResponseEntity<UserDto> deleteUser(@PathVariable Long id){
         return userService.deleteUser(id);
     }
-
-
-
 
 }

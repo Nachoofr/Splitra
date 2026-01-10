@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Entity
 @Data
@@ -37,6 +40,9 @@ public class User {
 
     @NotNull
     private boolean active;
+
+    @ManyToMany(mappedBy = "members")
+    private Set<Group> groups = new HashSet<>();
 
 
 
