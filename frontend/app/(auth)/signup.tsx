@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { authApi } from "../api/authApi";
 import { useRouter } from "expo-router";
 
-const signUp = () => {
+const SignUp = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
@@ -188,4 +188,4 @@ const signUp = () => {
   );
 };
 
-export default signUp;
+export default SignUp;
