@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Group {
+public class Groups {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

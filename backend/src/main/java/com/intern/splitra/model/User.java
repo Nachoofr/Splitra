@@ -42,7 +42,7 @@ public class User {
     private boolean active;
 
     @ManyToMany(mappedBy = "members")
-    private Set<Group> groups = new HashSet<>();
+    private Set<Groups> groups = new HashSet<>();
 
 
 
