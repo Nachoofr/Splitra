@@ -3,11 +3,13 @@ package com.intern.splitra.model;
 import enums.GroupStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Data
 public class Groups {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

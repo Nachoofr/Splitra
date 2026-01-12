@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class MyUserDetailsService implements UserDetailsService {
     @Autowired
     UserRepo userRepo;
+    User user;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -24,5 +25,7 @@ public class MyUserDetailsService implements UserDetailsService {
         }
 
         return new UserPrinciple(user);
+
+
     }
 }

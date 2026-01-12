@@ -1,4 +1,8 @@
 package com.intern.splitra.util;
 
-public class MapperUtil {
+import enums.GroupStatus;
+import org.mapstruct.Named;
+
+public interface MapperUtil {
+
 }
