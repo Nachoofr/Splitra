@@ -4,9 +4,9 @@ import { Tabs } from "expo-router";
 
 const Groups = () => {
   return (
-    <Tabs>
-        
-    </Tabs>
+    <View className="mt-40">
+      <Text>Groups</Text>
+    </View>
   );
 };
 

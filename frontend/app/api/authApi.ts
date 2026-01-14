@@ -1,5 +1,5 @@
 import AxiosInstance from './axiosConfig';
-import { SignInRequest, SignInResponse, SignUpRequest, SignUpResponse } from '../types/authtypes';
+import { SignInRequest, SignInResponse, SignUpRequest, SignUpResponse } from '../types/authTypes';
 
 export const authApi = {
   signUp: async (data: SignUpRequest): Promise<SignUpResponse> => {
