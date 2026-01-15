@@ -44,13 +44,13 @@ public class Groups {
     private Set<User> members = new HashSet<>();
 
 
-//    @Column(unique = true, nullable = false)
-//    private String inviteToken;
-//
-//    @PrePersist
-//    public void generateInviteToken() {
-//        if (this.inviteToken == null) {
-//            this.inviteToken = UUID.randomUUID().toString();
-//        }
+    @Column(unique = true, nullable = false)
+    private String inviteToken;
 
+    @PrePersist
+    public void generateInviteToken() {
+        if (this.inviteToken == null) {
+            this.inviteToken = UUID.randomUUID().toString();
+        }
+    }
 }

@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface GroupRepo extends JpaRepository<Groups, Long> {
     List<Groups> findGroupsByMembersId(long userId);
-//    Optional<Groups> findByInviteToken(String inviteToken);
+    Optional<Groups> findByInviteToken(String inviteToken);
 
 }

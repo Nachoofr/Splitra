@@ -2,6 +2,7 @@ package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.GroupDto;
 import com.intern.splitra.mapper.GroupMapper;
+import com.intern.splitra.model.Groups;
 import com.intern.splitra.model.User;
 import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.UserRepo;
@@ -38,6 +39,36 @@ public class GroupServiceImpl implements GroupService {
                 .map(groupMapper::toDto)
                 .toList();
         return new ResponseEntity<List<GroupDto>>(groups, HttpStatus.OK);
+    }
+
+    public ResponseEntity<GroupDto> joinGroup(String inviteToken, long userId) {
+        Groups group = groupRepo.findByInviteToken(inviteToken)
+                .orElseThrow(() -> new RuntimeException("Invalid invite link"));
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (group.getMembers().contains(user)) {
+            return new ResponseEntity<>(groupMapper.toDto(group), HttpStatus.OK);
+        }
+
+        group.getMembers().add(user);
+        groupRepo.save(group);
+        return new ResponseEntity<>(groupMapper.toDto(group), HttpStatus.OK);
+    }
+
+    public ResponseEntity<String> getInviteLink(long groupId, long userId) {
+        Groups group = groupRepo. findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group. getMembers().contains(user)) {
+            return new ResponseEntity<>("You are not a member of this group", HttpStatus. FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(group.getInviteToken(), HttpStatus.OK);
     }
 
 }

@@ -10,10 +10,7 @@ import com.intern.splitra.service.SecurityService.MyUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,6 +30,18 @@ public class GroupController {
     public ResponseEntity<List<GroupDto>> getAllGroups(@AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId = userPrinciple.getUser().getId();
         return groupService.getAllGroups(userId);
+    }
+
+    @PostMapping (GroupApiEndpointConstants.JOIN_GROUP)
+    public ResponseEntity<GroupDto> joinGroup(@PathVariable String inviteToken, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        long userId = userPrinciple.getUser().getId();
+        return groupService.joinGroup(inviteToken, userId);
+    }
+
+    @GetMapping(GroupApiEndpointConstants.GET_INVITE_LINK)
+    public ResponseEntity<String> getInviteLink(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        long userId = userPrinciple.getUser().getId();
+        return groupService.getInviteLink(id, userId);
     }
 
 }
