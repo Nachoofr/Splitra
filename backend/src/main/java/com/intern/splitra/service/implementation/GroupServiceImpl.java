@@ -11,6 +11,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -25,8 +28,16 @@ public class GroupServiceImpl implements GroupService {
         var groups = groupMapper.toEntity(groupDto);
         groups.setCreatedBy(user);
         groups.setStatus(GroupStatus.CREATED);
+        groups.getMembers().add(user);
         groupRepo.save(groups);
         return new ResponseEntity<>(groupMapper.toDto(groups), HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<List<GroupDto>> getAllGroups(long userId) {
+        var groups = groupRepo.findGroupsByMembersId(userId).stream()
+                .map(groupMapper::toDto)
+                .toList();
+        return new ResponseEntity<List<GroupDto>>(groups, HttpStatus.OK);
     }
 
 }

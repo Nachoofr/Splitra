@@ -22,4 +22,7 @@ public class GroupDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long createdBy;
 
+//    @JsonProperty(access = JsonProperty. Access.READ_ONLY)
+//    private String inviteToken;
+
 }
