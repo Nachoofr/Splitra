@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_BASE_URL = 'http://192.168.1.79:8080';//home
 // const API_BASE_URL = 'http://100.64.207.239:8080';//college
@@ -8,14 +8,19 @@ const AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type':  'application/json',
   },
 });
 
-// Request interceptor
-AxiosInstance.interceptors.request.use(
-  (config) => {
-    console.log('Request:', config.method?.toUpperCase(), config.url);
+// Request interceptor 
+AxiosInstance.interceptors. request.use(
+  async (config) => {
+    const token = await AsyncStorage.getItem('token');  
+    console.log('Token:', token); 
+    if (token) {
+      config. headers.Authorization = `Bearer ${token}`; 
+    }
+    console.log('Request:', config.method?. toUpperCase(), config.url);
     return config;
   },
   (error) => {
@@ -24,14 +29,14 @@ AxiosInstance.interceptors.request.use(
 );
 
 // Response interceptor
-AxiosInstance.interceptors.response.use(
+AxiosInstance. interceptors.response. use(
   (response) => {
-    console.log('Response:', response.status, response.config.url);
+    console.log('Response:', response.status, response.config. url);
     return response;
   },
   (error) => {
     if (error.response) {
-      console.error('Response error:', error.response.data);
+      console. error('Response error:', error.response.data);
     } else if (error.request) {
       console.error('Network error:', error.message);
     }

@@ -15,6 +15,7 @@ import AuthSecondaryButton from "../../component/authSecondaryButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { authApi } from "../api/authApi";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const router = useRouter();
@@ -39,7 +40,7 @@ const Login = () => {
       Alert.alert("Please enter your password");
       return;
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       Alert.alert("Error", "Please enter a valid email address");
@@ -57,30 +58,31 @@ const Login = () => {
 
       console.log("Login successful:", response);
 
+      await AsyncStorage.setItem("token", response);
+
       Alert.alert("Success", "Logged in successfully!", [
         {
           text: "OK",
           onPress: () => {
-            router.replace("/(home)/groups"); 
+            router.replace("/(home)/groups");
           },
         },
       ]);
     } catch (error: any) {
       console.error("Login error:", error);
-      
+
       let errorMessage = "Error signing in. Please try again.";
-      
+
       if (error.response) {
         const status = error.response.status;
-        
+
         if (status >= 400 && status < 500) {
           errorMessage = "Email or password is invalid";
-        }
-        else if (status >= 500) {
+        } else if (status >= 500) {
           errorMessage = "Error signing in. Please try again.";
         }
       }
-      
+
       Alert.alert("Error", errorMessage);
     } finally {
       setLoading(false);
