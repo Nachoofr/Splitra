@@ -7,6 +7,11 @@ export interface Group {
   createdBy: number;
 }
 
+export interface CreateGroupRequest {
+  groupName: string;
+  groupPicture: string;
+}
+
 export const groupApi = {
   // Get all groups
   getAllGroups: async (): Promise<Group[]> => {
@@ -17,4 +22,23 @@ export const groupApi = {
       throw error;
     }
   },
+
+  createGroup: async (data: CreateGroupRequest
+): Promise<Group> => {
+  try {
+    const response = await axiosInstance.post<Group>(
+      "/splitra/groups",
+      {
+        groupName: data.groupName,
+        groupPicture: data.groupPicture,
+
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+},
+
 };

@@ -1,4 +1,5 @@
 import { View, Text, Image, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const GroupCard = ({ group, onPress }) => {
   return (
@@ -19,7 +20,9 @@ const GroupCard = ({ group, onPress }) => {
         <Text className="text-gray-500 text-sm">{group.Status}</Text>
 
         <Pressable className="ml-7">
-          <Text>icon</Text>
+          <Pressable>
+            <Ionicons name="ellipsis-vertical" size={24} color="#9CA3AF" />
+          </Pressable>
         </Pressable>
       </View>
     </Pressable>

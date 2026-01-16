@@ -14,12 +14,14 @@ import HomeButton from "../../component/homeButton";
 import { groupApi, Group } from "../api/groupApi";
 import { Ionicons } from "@expo/vector-icons";
 import GroupCard from "../../component/groupCard";
+import CreateGroupModal from "../../component/createGruop";
 
 const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
 
   useEffect(() => {
     fetchGroups();
@@ -86,9 +88,17 @@ const Groups = () => {
           />
         ))}
       </View>
-      <Pressable className="absolute right-4 bottom-5">
+      <Pressable
+        className="absolute right-4 bottom-5"
+        onPress={() => setShowCreateGroup(true)}
+      >
         <Ionicons name="add-circle" size={80} color="primary" />
       </Pressable>
+      <CreateGroupModal
+        visible={showCreateGroup}
+        onClose={() => setShowCreateGroup(false)}
+        onGroupCreated={fetchGroups}
+      />
     </View>
   );
 };
