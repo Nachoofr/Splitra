@@ -6,6 +6,8 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 
@@ -15,6 +17,7 @@ import { groupApi, Group } from "../api/groupApi";
 import { Ionicons } from "@expo/vector-icons";
 import GroupCard from "../../component/groupCard";
 import CreateGroupModal from "../../component/createGruop";
+import { router } from "expo-router";
 
 const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -79,15 +82,26 @@ const Groups = () => {
 
         <HomeButton text="Unsettled" />
       </View>
-      <View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#101828"
+          />
+        }
+        contentContainerStyle={{ paddingBottom: 120 }}
+      >
         {groups.map((group, index) => (
           <GroupCard
             key={index}
             group={group}
-            onPress={(group) => console.log("Group pressed:", group.groupName)}
+            // onPress={(group) => console.log("Group pressed:", group.groupName)}
+            onPress={(group) => router.push(`/group/${group.id}/home`)}
           />
         ))}
-      </View>
+      </ScrollView>
       <Pressable
         className="absolute right-4 bottom-5"
         onPress={() => setShowCreateGroup(true)}
