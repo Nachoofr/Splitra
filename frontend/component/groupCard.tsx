@@ -1,7 +1,7 @@
 import { View, Text, Image, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const GroupCard = ({ group, onPress }) => {
+const GroupCard = ({ group, onPress }: groupApi) => {
   return (
     <Pressable
       onPress={() => onPress(group)}

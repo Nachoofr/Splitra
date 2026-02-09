@@ -25,6 +25,7 @@ const Groups = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<string>("All");
 
   useEffect(() => {
     fetchGroups();
@@ -49,6 +50,19 @@ const Groups = () => {
     await fetchGroups();
     setRefreshing(false);
   };
+
+  const getFilteredGroups = () => {
+    if (selectedFilter === "All") {
+      return groups;
+    } else if (selectedFilter === "Settled") {
+      return groups.filter((group) => group.Status === "SETTLED");
+    } else if (selectedFilter === "Unsettled") {
+      return groups.filter((group) => group.Status === "UNSETTLED");
+    }
+    return groups;
+  };
+
+  const filteredGroups = getFilteredGroups();
 
   if (loading && !refreshing) {
     return (
@@ -76,11 +90,23 @@ const Groups = () => {
       <CommonTitle text="Your Groups" />
 
       <View className="flex-row w-full mt-3 gap-5">
-        <HomeButton text="All" />
+        <HomeButton
+          text="All"
+          selected={selectedFilter === "All"}
+          onPress={() => setSelectedFilter("All")}
+        />
 
-        <HomeButton text="Settled" />
+        <HomeButton
+          text="Settled"
+          selected={selectedFilter === "Settled"}
+          onPress={() => setSelectedFilter("Settled")}
+        />
 
-        <HomeButton text="Unsettled" />
+        <HomeButton
+          text="Unsettled"
+          selected={selectedFilter === "Unsettled"}
+          onPress={() => setSelectedFilter("Unsettled")}
+        />
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -93,14 +119,21 @@ const Groups = () => {
         }
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {groups.map((group, index) => (
-          <GroupCard
-            key={index}
-            group={group}
-            // onPress={(group) => console.log("Group pressed:", group.groupName)}
-            onPress={(group) => router.push(`/group/${group.id}/home`)}
-          />
-        ))}
+        {filteredGroups.length > 0 ? (
+          filteredGroups.map((group, index) => (
+            <GroupCard
+              key={index}
+              group={group}
+              onPress={(group) => router.push(`/group/${group.id}/home`)}
+            />
+          ))
+        ) : (
+          <View className="flex-1 justify-center items-center mt-20">
+            <Text className="text-gray-500 text-lg">
+              No {selectedFilter.toLowerCase()} groups found
+            </Text>
+          </View>
+        )}
       </ScrollView>
       <Pressable
         className="absolute right-4 bottom-5"
