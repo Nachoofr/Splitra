@@ -1,6 +1,8 @@
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import axiosInstance from './axiosConfig';
 
 export interface Group {
+  idr: number;
   groupName: string;
   groupPicture: string;
   Status: string;
@@ -13,7 +15,6 @@ export interface CreateGroupRequest {
 }
 
 export const groupApi = {
-  // Get all groups
   getAllGroups: async (): Promise<Group[]> => {
     try {
       const response = await axiosInstance.get('/splitra/groups');
@@ -35,6 +36,15 @@ export const groupApi = {
       }
     );
 
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+},
+
+getGroupById: async (groupId: number): Promise<Group> => {
+  try {
+    const response = await axiosInstance.get<Group>(`/splitra/groups/${groupId}`);
     return response.data;
   } catch (error) {
     throw error;

@@ -1,9 +1,7 @@
 import {
   Text,
   View,
-  FlatList,
   ActivityIndicator,
-  Image,
   TouchableOpacity,
   Pressable,
   ScrollView,
@@ -124,7 +122,12 @@ const Groups = () => {
             <GroupCard
               key={index}
               group={group}
-              onPress={(group) => router.push(`/group/${group.id}/home`)}
+              onPress={(group) =>
+                router.push({
+                  pathname: "/group/[id]",
+                  params: { id: group.id.toString() },
+                })
+              }
             />
           ))
         ) : (
