@@ -1,12 +1,9 @@
 package com.intern.splitra.controller;
 
 import com.intern.splitra.constant.GroupApiEndpointConstants;
-import com.intern.splitra.constant.UserApiEndpointConstants;
 import com.intern.splitra.dto.GroupDto;
-import com.intern.splitra.dto.UserDto;
 import com.intern.splitra.model.SecurityModel.UserPrinciple;
 import com.intern.splitra.service.GroupService;
-import com.intern.splitra.service.SecurityService.MyUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +27,11 @@ public class GroupController {
     public ResponseEntity<List<GroupDto>> getAllGroups(@AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId = userPrinciple.getUser().getId();
         return groupService.getAllGroups(userId);
+    }
+
+    @GetMapping(GroupApiEndpointConstants.GROUP_ID)
+    public ResponseEntity<GroupDto> getGroupById(@PathVariable long id) {
+        return groupService.getGroupById(id);
     }
 
     @PostMapping (GroupApiEndpointConstants.JOIN_GROUP)

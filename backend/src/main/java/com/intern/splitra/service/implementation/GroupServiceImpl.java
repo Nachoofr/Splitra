@@ -41,6 +41,14 @@ public class GroupServiceImpl implements GroupService {
         return new ResponseEntity<List<GroupDto>>(groups, HttpStatus.OK);
     }
 
+    public ResponseEntity<GroupDto> getGroupById(long groupId) {
+        var group = groupRepo.findById(groupId);
+        if (group.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(groupMapper.toDto(group.get()), HttpStatus.OK);
+    }
+
     public ResponseEntity<GroupDto> joinGroup(String inviteToken, long userId) {
         Groups group = groupRepo.findByInviteToken(inviteToken)
                 .orElseThrow(() -> new RuntimeException("Invalid invite link"));
