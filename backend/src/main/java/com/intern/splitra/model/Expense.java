@@ -1,0 +1,63 @@
+package com.intern.splitra.model;
+
+import com.intern.splitra.enums.SplitMethod;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+@Entity
+@Data
+@EqualsAndHashCode(exclude = {"paidBy", "group"})
+@ToString(exclude = {"paidBy", "group"})
+public class Expense {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String description;
+
+    @NotNull
+    @Column(nullable = false)
+    private double amount;
+
+    @NotNull
+    @Column(nullable = false)
+    private LocalDateTime date;
+
+    @ManyToOne
+    private Category category;
+
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ExpensePayment> paidBy = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SplitMethod splitMethod;
+
+    @ManyToOne
+    @JoinColumn(name = "group_id", nullable = false)
+    private Groups group;
+
+
+    //for now comment, will be used after implementing split logic
+//    @ElementCollection
+//    @CollectionTable(
+//            name = "expense_split_amounts",
+//            joinColumns = @JoinColumn(name = "expense_id")
+//    )
+//    @MapKeyJoinColumn(name = "user_id")
+//    @Column(name = "amount_owed")
+//    private Map<User, Double> splitAmounts = new HashMap<>();
+
+
+
+}

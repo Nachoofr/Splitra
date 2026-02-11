@@ -1,5 +1,6 @@
 package com.intern.splitra.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intern.splitra.model.User;
 import enums.GroupStatus;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupDto {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long id;
 
     private String groupName;
 
