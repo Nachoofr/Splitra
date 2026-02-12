@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,9 +18,13 @@ public class ExpenseDto {
 
     private double amount;
 
-    private String category;
+    private Long category;
 
     private String splitMethod;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long groupId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Set<ExpensePaymentDto> paidBy;
 }
