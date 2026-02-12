@@ -84,4 +84,12 @@ public class CategoryServiceImpl implements CategoryService {
         return new ResponseEntity<>(categoryMapper.toDto(category), HttpStatus.OK);
     }
 
+    public ResponseEntity<List<CategoryDto>> getCategoriesByGroupId(Long groupId) {
+        List<CategoryDto> categories = categoryRepo.findAllByGroupId(groupId).stream()
+                .map(categoryMapper ::toDto)
+                .toList();
+
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
 }

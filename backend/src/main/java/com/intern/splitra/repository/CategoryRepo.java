@@ -12,4 +12,5 @@ public interface CategoryRepo extends JpaRepository<Category, Long> {
     List<Category> findByGroupIsNull();
     Optional<Category> findByNameAndGroupId(String name, Long groupId);
     Optional<Category> findByNameAndGroupIsNull(String name);
+    List<Category> findAllByGroupId(Long groupId);
 }

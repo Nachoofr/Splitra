@@ -33,4 +33,9 @@ public class CategoryController {
         Long groupId = categoryDto.getGroupId();
         return categoryService.createCustomCategory(groupId, categoryDto, userId);
     }
+
+    @GetMapping(CategoryApiEndpointConstants.GROUP_CATEGORIES)
+    public ResponseEntity<List<CategoryDto>> getCategoriesByGroupId(@PathVariable Long groupId) {
+        return categoryService.getCategoriesByGroupId(groupId);
+    }
 }
