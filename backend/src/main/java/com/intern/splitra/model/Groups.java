@@ -13,8 +13,8 @@ import java.util.UUID;
 
 @Entity
 @Data
-@EqualsAndHashCode(exclude = {"members", "createdBy"})
-@ToString(exclude = {"members", "createdBy"})
+@EqualsAndHashCode(exclude = {"members", "createdBy","customCategories"})
+@ToString(exclude = {"members", "createdBy","customCategories"})
 public class Groups {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +33,9 @@ public class Groups {
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Category> customCategories = new HashSet<>();
 
     // group members
     @ManyToMany

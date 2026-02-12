@@ -11,14 +11,14 @@ import org.mapstruct.MappingTarget;
 public interface ExpensePaymentMapper {
 
     @Mapping(source="expense.id", target="expenseId")
-    @Mapping(source="paidBy.id", target="paidBy")
-    ExpensePaymentDto toDto(Expense expense);
+    @Mapping(source="paidBy.id", target="paidByUserId")
+    ExpensePaymentDto toDto(ExpensePayment expensePayment);
 
     @Mapping(source="expenseId", target="expense.id")
-    @Mapping(source="paidBy", target="paidBy.id")
+    @Mapping(source="paidByUserId", target="paidBy.id")
     ExpensePayment toEntity(ExpensePaymentDto expensePaymentDto);
 
     @Mapping(source="expenseId", target="expense.id")
-    @Mapping(source="paidBy", target="paidBy.id")
+    @Mapping(source="paidByUserId", target="paidBy.id")
     ExpensePayment update(ExpensePaymentDto expensePaymentDto, @MappingTarget ExpensePayment expensePayment);
 }
