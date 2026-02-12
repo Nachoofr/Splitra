@@ -1,5 +1,6 @@
 package com.intern.splitra.dto;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -21,8 +22,8 @@ public class CategoryDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean isGlobal;
 
-    @JsonIgnore
-    public boolean isGlobal() {
+    @JsonGetter("isGlobal")
+    public Boolean isGlobal() {
         return this.groupId == null;
     }
 }

@@ -8,5 +8,6 @@ import java.util.List;
 public interface CategoryService {
     ResponseEntity<List<CategoryDto>> createGlobalCategory();
     ResponseEntity<List<CategoryDto>> getAllCategories();
+    ResponseEntity<CategoryDto> createCustomCategory(Long groupId, CategoryDto categoryDto, Long userId);
 
 }
