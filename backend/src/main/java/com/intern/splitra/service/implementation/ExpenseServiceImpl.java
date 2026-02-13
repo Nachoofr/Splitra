@@ -28,6 +28,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     ExpenseMapper expenseMapper;
     GroupRepo groupRepo;
 
+
     public ResponseEntity<ExpenseDto> addExpense(ExpenseDto expenseDto, Long userId, Long groupId) {
         Groups group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
@@ -57,17 +58,36 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setCreatedBy(user);
         expense.setCategory(category);
         expense.setDate(LocalDateTime.now());
-
         group.setStatus(GroupStatus.UNSETTLED);
         expenseRepo.save(expense);
 
         return new ResponseEntity<>(expenseMapper.toDto(expense), HttpStatus.CREATED);
     }
 
+
     public ResponseEntity<List<ExpenseDto>> getAllExpenses(){
         var expenses = expenseRepo.findAll().stream()
                 .map(expenseMapper::toDto)
                 .toList();
+        return new ResponseEntity<>(expenses, HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<List<ExpenseDto>> getExpensesByGroup(long groupId, long userId){
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().stream().anyMatch(member -> member.getId() == userId)){
+            throw new RuntimeException("User is not a member of the group");
+        }
+
+        var expenses = expenseRepo.findALlByGroupId(groupId).stream()
+                .map(expenseMapper::toDto)
+                .toList();
+
         return new ResponseEntity<>(expenses, HttpStatus.OK);
     }
 }

@@ -21,13 +21,17 @@ public class ExpenseController {
     @PostMapping(ExpenseApiEndpointConstants.GROUP_EXPENSES)
     public ResponseEntity<ExpenseDto> addExpense(@RequestBody ExpenseDto expense, @AuthenticationPrincipal UserPrinciple userPrinciple, @PathVariable Long groupId) {
         Long userId = userPrinciple.getUser().getId();
-        System.out.println("User ID: " + userId);
-        System.out.println("Group ID: " + groupId);
         return expenseService.addExpense(expense, userId, groupId);
     }
 
     @GetMapping(ExpenseApiEndpointConstants.EXPENSES)
     public ResponseEntity<List<ExpenseDto>> getAllExpenses() {
         return expenseService.getAllExpenses();
+    }
+
+    @GetMapping(ExpenseApiEndpointConstants.GROUP_EXPENSES)
+    public ResponseEntity<List<ExpenseDto>> getExpensesByGroup(@AuthenticationPrincipal UserPrinciple userPrinciple, @PathVariable Long groupId) {
+        long userId = userPrinciple.getUser().getId();
+        return expenseService.getExpensesByGroup(groupId, userId);
     }
 }
