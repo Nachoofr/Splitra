@@ -28,7 +28,7 @@ public class Groups {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private GroupStatus Status;
+    private GroupStatus status;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)

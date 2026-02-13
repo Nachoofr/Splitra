@@ -47,6 +47,10 @@ public class Expense {
     @JoinColumn(name = "group_id", nullable = false)
     private Groups group;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
+    private User createdBy;
 
     //for now comment, will be used after implementing split logic
 //    @ElementCollection

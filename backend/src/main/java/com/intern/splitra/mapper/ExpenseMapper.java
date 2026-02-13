@@ -13,15 +13,22 @@ public interface ExpenseMapper {
     @Mapping(source="category.id", target = "category")
     @Mapping(source="splitMethod", target = "splitMethod")
     @Mapping(source="group.id", target = "groupId")
+    @Mapping(source="createdBy.id", target = "createdBy")
+    @Mapping(source="createdBy.fullName", target = "createdByUsername")
     ExpenseDto toDto(Expense expense);
 
-    @Mapping(source="category", target = "category.id")
     @Mapping(source="splitMethod", target = "splitMethod", qualifiedByName = "mapSplitMethod")
-    @Mapping(source="groupId", target = "group.id")
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "group", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "paidBy", ignore = true)
     Expense toEntity(ExpenseDto expenseDto);
 
-    @Mapping(source="category", target = "category.id")
+
     @Mapping(source="splitMethod", target = "splitMethod", qualifiedByName = "mapSplitMethod")
-    @Mapping(source="groupId", target = "group.id")
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "group", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "paidBy", ignore = true)
     Expense update(ExpenseDto expenseDto, @MappingTarget Expense expense);
 }
