@@ -31,6 +31,5 @@ public class ExpenseDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdByUsername;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Set<ExpensePaymentDto> paidBy;
 }

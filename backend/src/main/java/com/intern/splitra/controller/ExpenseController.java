@@ -2,7 +2,6 @@ package com.intern.splitra.controller;
 
 import com.intern.splitra.constant.ExpenseApiEndpointConstants;
 import com.intern.splitra.dto.ExpenseDto;
-import com.intern.splitra.model.Expense;
 import com.intern.splitra.model.SecurityModel.UserPrinciple;
 import com.intern.splitra.service.ExpenseService;
 import lombok.AllArgsConstructor;
