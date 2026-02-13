@@ -15,9 +15,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -63,5 +62,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         expenseRepo.save(expense);
 
         return new ResponseEntity<>(expenseMapper.toDto(expense), HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<List<ExpenseDto>> getAllExpenses(){
+        var expenses = expenseRepo.findAll().stream()
+                .map(expenseMapper::toDto)
+                .toList();
+        return new ResponseEntity<>(expenses, HttpStatus.OK);
     }
 }
