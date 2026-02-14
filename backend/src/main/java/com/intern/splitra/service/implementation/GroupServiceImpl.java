@@ -79,4 +79,11 @@ public class GroupServiceImpl implements GroupService {
         return new ResponseEntity<>(group.getInviteToken(), HttpStatus.OK);
     }
 
+    public ResponseEntity<Long> getNumberOfMembers(long groupId) {
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+        long numberOfMembers = group.getMembers().size();
+        return new ResponseEntity<>(numberOfMembers, HttpStatus.OK);
+    }
+
 }

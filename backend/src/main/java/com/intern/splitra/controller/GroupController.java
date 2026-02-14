@@ -46,4 +46,9 @@ public class GroupController {
         return groupService.getInviteLink(id, userId);
     }
 
+    @GetMapping(GroupApiEndpointConstants.GROUP_MEMBERS)
+    public ResponseEntity<Long> getNumberOfMembers(@PathVariable long id) {
+        return groupService.getNumberOfMembers(id);
+    }
+
 }

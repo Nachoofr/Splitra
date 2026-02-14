@@ -11,5 +11,6 @@ public interface GroupService {
     ResponseEntity<GroupDto> getGroupById(long groupId);
     ResponseEntity<GroupDto> joinGroup(String inviteToken, long userId);
     ResponseEntity<String> getInviteLink(long groupId, long userId);
+    ResponseEntity<Long> getNumberOfMembers(long groupId);
 
 }
