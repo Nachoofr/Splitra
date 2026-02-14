@@ -120,10 +120,28 @@ public class ExpenseServiceImpl implements ExpenseService {
             throw new RuntimeException("User is not a member of the group");
         }
 
-        var expenses = expenseRepo.findALlByGroupId(groupId).stream()
+        var expenses = expenseRepo.findAllByGroupId(groupId).stream()
                 .map(expenseMapper::toDto)
                 .toList();
 
         return new ResponseEntity<>(expenses, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Double> getTotalExpenseByGroup(long groupId, long userId){
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().stream().anyMatch(member -> member.getId() == userId)){
+            throw new RuntimeException("User is not a member of the group");
+        }
+
+        double totalExpense = expenseRepo.findAllByGroupId(groupId).stream()
+                .mapToDouble(expense -> expense.getAmount())
+                .sum();
+
+        return new ResponseEntity<>(totalExpense, HttpStatus.OK);
     }
 }

@@ -10,4 +10,5 @@ public interface ExpenseService {
     ResponseEntity<ExpenseDto> addExpense(ExpenseDto expenseDto, Long userId, Long groupId);
     ResponseEntity<List<ExpenseDto>> getAllExpenses();
     ResponseEntity<List<ExpenseDto>> getExpensesByGroup(long groupId, long userId);
+    ResponseEntity<Double> getTotalExpenseByGroup(long groupId, long userId);
 }

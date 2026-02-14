@@ -33,4 +33,11 @@ public class ExpenseController {
         long userId = userPrinciple.getUser().getId();
         return expenseService.getExpensesByGroup(groupId, userId);
     }
+
+    @GetMapping(ExpenseApiEndpointConstants.TOTAL_EXPENSES)
+    public ResponseEntity<Double> getTotalExpenseByGroup(@AuthenticationPrincipal UserPrinciple userPrinciple, @PathVariable Long groupId) {
+        long userId = userPrinciple.getUser().getId();
+        return expenseService.getTotalExpenseByGroup(groupId, userId);
+    }
+
 }
