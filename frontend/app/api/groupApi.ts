@@ -2,7 +2,7 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import axiosInstance from './axiosConfig';
 
 export interface Group {
-  idr: number;
+  id: number;
   groupName: string;
   groupPicture: string;
   Status: string;

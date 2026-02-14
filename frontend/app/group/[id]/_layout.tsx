@@ -1,10 +1,11 @@
-import { View, ActivityIndicator, Text, Pressable } from "react-native";
+import { View, ActivityIndicator, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Tabs, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 import GroupHeader from "../../../component/groupHeader";
 import { groupApi } from "../../api/groupApi";
+import { GroupContext } from "./groupContext";
 
 const GroupLayout = () => {
   const { id } = useLocalSearchParams();
@@ -63,93 +64,95 @@ const GroupLayout = () => {
   }
 
   return (
-    <View className="flex-1 relative">
-      <GroupHeader
-        groupName={group.groupName}
-        groupPicture={group.groupPicture}
-        memberCount={memberCount}
-      />
-
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: { paddingTop: 13, height: 100 },
-          tabBarActiveTintColor: "primary",
-          tabBarInactiveTintColor: "#9AA1AE",
-          tabBarLabelStyle: { fontSize: 12 },
-        }}
-      >
-        <Tabs.Screen
-          name="home"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                size={26}
-                name="home-outline"
-                color={focused ? "primary" : "#9AA1AE"}
-              />
-            ),
-          }}
+    <GroupContext.Provider value={{ group, memberCount }}>
+      <View className="flex-1 relative">
+        <GroupHeader
+          groupName={group.groupName}
+          groupPicture={group.groupPicture}
+          memberCount={memberCount}
         />
 
-        <Tabs.Screen
-          name="activity"
-          options={{
-            title: "Activity",
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                size={26}
-                name="notifications-outline"
-                color={focused ? "primary" : "#9AA1AE"}
-              />
-            ),
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarStyle: { paddingTop: 13, height: 100 },
+            tabBarActiveTintColor: "primary",
+            tabBarInactiveTintColor: "#9AA1AE",
+            tabBarLabelStyle: { fontSize: 12 },
           }}
-        />
+        >
+          <Tabs.Screen
+            name="home"
+            options={{
+              title: "Home",
+              tabBarIcon: ({ focused }) => (
+                <Ionicons
+                  size={26}
+                  name="home-outline"
+                  color={focused ? "primary" : "#9AA1AE"}
+                />
+              ),
+            }}
+          />
 
-        <Tabs.Screen
-          name="category"
-          options={{
-            title: "Categories",
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                size={26}
-                name="grid-outline"
-                color={focused ? "primary" : "#9AA1AE"}
-              />
-            ),
-          }}
-        />
+          <Tabs.Screen
+            name="activity"
+            options={{
+              title: "Activity",
+              tabBarIcon: ({ focused }) => (
+                <Ionicons
+                  size={26}
+                  name="notifications-outline"
+                  color={focused ? "primary" : "#9AA1AE"}
+                />
+              ),
+            }}
+          />
 
-        <Tabs.Screen
-          name="settlement"
-          options={{
-            title: "Settlements",
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                size={26}
-                name="cash-outline"
-                color={focused ? "primary" : "#9AA1AE"}
-              />
-            ),
-          }}
-        />
+          <Tabs.Screen
+            name="category"
+            options={{
+              title: "Categories",
+              tabBarIcon: ({ focused }) => (
+                <Ionicons
+                  size={26}
+                  name="grid-outline"
+                  color={focused ? "primary" : "#9AA1AE"}
+                />
+              ),
+            }}
+          />
 
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: "Settings",
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                size={26}
-                name="settings-outline"
-                color={focused ? "primary" : "#9AA1AE"}
-              />
-            ),
-          }}
-        />
-      </Tabs>
-    </View>
+          <Tabs.Screen
+            name="settlement"
+            options={{
+              title: "Settlements",
+              tabBarIcon: ({ focused }) => (
+                <Ionicons
+                  size={26}
+                  name="cash-outline"
+                  color={focused ? "primary" : "#9AA1AE"}
+                />
+              ),
+            }}
+          />
+
+          <Tabs.Screen
+            name="settings"
+            options={{
+              title: "Settings",
+              tabBarIcon: ({ focused }) => (
+                <Ionicons
+                  size={26}
+                  name="settings-outline"
+                  color={focused ? "primary" : "#9AA1AE"}
+                />
+              ),
+            }}
+          />
+        </Tabs>
+      </View>
+    </GroupContext.Provider>
   );
 };
 
