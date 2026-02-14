@@ -12,10 +12,11 @@ const GroupLayout = () => {
   const [group, setGroup] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [memberCount, setMemberCount] = useState<number>(Number);
   useEffect(() => {
     if (id) {
       fetchGroupData(Number(id));
+      fetchGroupMemberCount(Number(id));
     }
   }, [id]);
 
@@ -32,6 +33,16 @@ const GroupLayout = () => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchGroupMemberCount = async (groupId: number) => {
+    try {
+      const data = await groupApi.getGroupMemberCount(groupId);
+      setMemberCount(data);
+    } catch (err: any) {
+      setError("Failed to load group member count");
+      console.error(err);
     }
   };
 
@@ -56,7 +67,7 @@ const GroupLayout = () => {
       <GroupHeader
         groupName={group.groupName}
         groupPicture={group.groupPicture}
-        memberCount={group.members?.length ?? 0} // need to update according to the backend
+        memberCount={memberCount}
       />
 
       <Tabs

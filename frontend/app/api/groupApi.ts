@@ -51,4 +51,13 @@ getGroupById: async (groupId: number): Promise<Group> => {
   }
 },
 
+getGroupMemberCount: async (groupId: number):Promise<number> => {
+try{
+  const response = await axiosInstance.get<number>(`/splitra/groups/${groupId}/members/count`);
+  return response.data;
+  } catch (error) {
+    throw error;
+}
+}
+
 };

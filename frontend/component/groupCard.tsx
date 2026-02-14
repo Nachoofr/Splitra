@@ -11,6 +11,20 @@ interface groupApi {
 }
 
 const GroupCard = ({ group, onPress }: groupApi) => {
+  const getStatusStyle = (status: string) => {
+    switch (status.toUpperCase()) {
+      case "SETTLED":
+        return "bg-[#F0FDF4] text-green-600";
+      case "UNSETTLED":
+        return "bg-[#FDE2E2] text-[#E7000B]";
+      case "CREATED":
+        return "bg-[#E2EAFD] text-[#155DFC]";
+      default:
+        return "bg-gray-50 text-gray-600";
+    }
+  };
+
+  const statusStyle = getStatusStyle(group.Status);
   return (
     <Pressable
       onPress={() => onPress(group)}
@@ -26,8 +40,15 @@ const GroupCard = ({ group, onPress }: groupApi) => {
           {group.groupName}
         </Text>
 
-        <Text className="text-gray-500 text-sm">{group.Status}</Text>
-
+        <View
+          className={`px-3 py-1.5 rounded-full ${getStatusStyle(group.Status)}`}
+        >
+          <Text
+            className={`text-xs font-semibold ${getStatusStyle(group.Status)}`}
+          >
+            {group.Status}
+          </Text>
+        </View>
         <Pressable className="ml-7">
           <Pressable>
             <Ionicons name="ellipsis-vertical" size={24} color="#9CA3AF" />
