@@ -15,6 +15,7 @@ public interface ExpenseMapper {
     @Mapping(source="group.id", target = "groupId")
     @Mapping(source="createdBy.id", target = "createdBy")
     @Mapping(source="createdBy.fullName", target = "createdByUsername")
+    @Mapping(source="category.name", target = "categoryName")
     ExpenseDto toDto(Expense expense);
 
     @Mapping(source="splitMethod", target = "splitMethod", qualifiedByName = "mapSplitMethod")

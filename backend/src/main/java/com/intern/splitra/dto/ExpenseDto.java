@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -30,6 +32,11 @@ public class ExpenseDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdByUsername;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String categoryName;
+
+    private LocalDateTime date;
 
     private Set<ExpensePaymentDto> paidBy;
 }
