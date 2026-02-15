@@ -40,4 +40,17 @@ public class ExpenseController {
         return expenseService.getTotalExpenseByGroup(groupId, userId);
     }
 
+    @PostMapping(ExpenseApiEndpointConstants.GROUP_EXPENSES_ID)
+    public ResponseEntity<ExpenseDto> updateExpense (@RequestBody ExpenseDto expenseDto, @AuthenticationPrincipal UserPrinciple userPrinciple, @PathVariable Long groupId, @PathVariable Long expenseId) {
+        long userId = userPrinciple.getUser().getId();
+        return expenseService.editExpense(groupId, userId, expenseId, expenseDto);
+    }
+
+    @DeleteMapping(ExpenseApiEndpointConstants.GROUP_EXPENSES_ID)
+    public ResponseEntity<Void> deleteExpense (@AuthenticationPrincipal UserPrinciple userPrinciple, @PathVariable Long groupId, @PathVariable Long expenseId) {
+        long userId = userPrinciple.getUser().getId();
+        return expenseService.deleteExpense(groupId, userId, expenseId);
+    }
+
+
 }
