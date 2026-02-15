@@ -3,6 +3,7 @@ package com.intern.splitra.controller;
 import com.intern.splitra.constant.GroupApiEndpointConstants;
 import com.intern.splitra.dto.GroupDto;
 import com.intern.splitra.model.SecurityModel.UserPrinciple;
+import com.intern.splitra.model.User;
 import com.intern.splitra.service.GroupService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,12 @@ public class GroupController {
     @GetMapping(GroupApiEndpointConstants.GROUP_MEMBERS)
     public ResponseEntity<Long> getNumberOfMembers(@PathVariable long id) {
         return groupService.getNumberOfMembers(id);
+    }
+
+    @GetMapping(GroupApiEndpointConstants.GROUP_ID + "/members")
+    public ResponseEntity<List<String>> getGroupMembers(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        long userId= userPrinciple.getUser().getId();
+        return groupService.getGroupMembers(id, userId);
     }
 
 }
