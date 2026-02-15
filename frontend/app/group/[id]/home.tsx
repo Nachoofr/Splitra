@@ -1,4 +1,4 @@
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View, ScrollView, RefreshControl } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Expense, expenseApi } from "../../api/expenseApi";
@@ -10,6 +10,7 @@ const Home = () => {
   const { group } = useGroup();
   const [error, setError] = useState<string | null>(null);
   const [totalExpense, setTotalExpense] = useState<number>();
+  const [refreshing, setRefreshing] = useState(false);
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
 
   const formatDate = (dateString: string) => {
@@ -60,6 +61,13 @@ const Home = () => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchTotalExpense(Number(group.id));
+    await fetchAllExpenses(Number(group.id));
+    setRefreshing(false);
+  };
+
   return (
     <View>
       <TotalExpenseCard
@@ -71,38 +79,49 @@ const Home = () => {
         <View className="ml-6">
           <CommonTitleGroups text="Expenses" />
         </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#101828"
+            />
+          }
+          contentContainerStyle={{ paddingBottom: 120 }}
+        >
+          {allExpenses.map((expense) => {
+            const { date, time } = formatDate(expense.date);
+            const paidByNames = expense.paidBy
+              .map((payment) => payment.paidByUserName)
+              .join(", ");
+            return (
+              <View
+                key={expense.id}
+                className="bg-white w-auto rounded-3xl p-6 shadow-sm mx-6 mb-3"
+              >
+                <View className="flex-col">
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-xl">{expense.description}</Text>
+                    <Text className="text-xl font-bold">
+                      NPR {expense.amount}
+                    </Text>
+                  </View>
 
-        {allExpenses.map((expense) => {
-          const { date, time } = formatDate(expense.date);
-          const paidByNames = expense.paidBy
-            .map((payment) => payment.paidByUserName)
-            .join(", ");
-          return (
-            <View
-              key={expense.id}
-              className="bg-white w-auto rounded-3xl p-6 shadow-sm mx-6 mb-3"
-            >
-              <View className="flex-col">
-                <View className="flex-row items-center justify-between">
-                  <Text className="text-xl">{expense.description}</Text>
-                  <Text className="text-xl font-bold">
-                    NPR {expense.amount}
-                  </Text>
-                </View>
+                  <View className="flex-row items-center justify-between mt-5">
+                    <Text>{expense.categoryName}</Text>
 
-                <View className="flex-row items-center justify-between mt-5">
-                  <Text>{expense.categoryName}</Text>
+                    <Text className="text-gray-500">{paidByNames}</Text>
 
-                  <Text className="text-gray-500">{paidByNames}</Text>
-
-                  <View>
-                    <Text className="text-gray-500">{date}</Text>
+                    <View>
+                      <Text className="text-gray-500">{date}</Text>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
-          );
-        })}
+            );
+          })}
+        </ScrollView>
       </View>
     </View>
   );

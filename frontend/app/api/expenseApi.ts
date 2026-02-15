@@ -8,6 +8,21 @@ export interface ExpensePayment{
     amountPaid: number;
 }
 
+export interface ExpensePaymentRequest{
+    paidByUserId: number;
+    amountPaid: number;
+}
+
+
+export interface AddExpenseRequest{
+  description: string;
+  amount: number;
+  date: string;
+  category: number;
+  paidBy: ExpensePaymentRequest[];
+  splitMethod: string;
+}
+
 
 export interface TotalExpenseByGroup{
     totalExpense: number;
@@ -21,9 +36,6 @@ export interface Expense{
     categoryName: string;
     paidBy: ExpensePayment[];
     date: string;
-    
-
-
 }
 
 export const expenseApi = {
@@ -43,5 +55,22 @@ export const expenseApi = {
     } catch (error) {
       throw error;
     }
+      },
+
+    addExpense: async (data: AddExpenseRequest, groupId: number): Promise<Expense> => {
+      try {
+        const response = await axiosInstance.post<Expense>(`/splitra/expenses/group/${groupId}`,
+      {
+        description: data.description,
+        amount: data.amount,
+        category: data.category,
+        splitMethod: data.splitMethod,
+        paidBy: data.paidBy
       }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+},
     }

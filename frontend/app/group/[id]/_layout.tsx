@@ -1,4 +1,4 @@
-import { View, ActivityIndicator, Text } from "react-native";
+import { View, ActivityIndicator, Text, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Tabs, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import GroupHeader from "../../../component/groupHeader";
 import { groupApi } from "../../api/groupApi";
 import { GroupContext } from "./groupContext";
+import AddExpenseModal from "../../../component/addExpense";
 
 const GroupLayout = () => {
   const { id } = useLocalSearchParams();
@@ -13,6 +14,7 @@ const GroupLayout = () => {
   const [group, setGroup] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddExpense, setAddExpense] = useState(false);
   const [memberCount, setMemberCount] = useState<number>(Number);
   useEffect(() => {
     if (id) {
@@ -152,6 +154,27 @@ const GroupLayout = () => {
           />
         </Tabs>
       </View>
+      <Pressable className="absolute right-7 bottom-60 bg-primary rounded-full p-4">
+        <Ionicons name="camera" size={35} color="white" />
+      </Pressable>
+      <Pressable
+        className="absolute right-4 bottom-36"
+        onPress={() => setAddExpense(true)}
+      >
+        <Ionicons name="add-circle" size={80} color="primary" />
+      </Pressable>
+      <AddExpenseModal
+        visible={showAddExpense}
+        onClose={() => setAddExpense(false)}
+        groupId={String(id)}
+        groupName={group.groupName}
+        onExpenseAdded={() => {
+          {
+            fetchGroupData;
+          }
+          console.log("Expense added");
+        }}
+      />
     </GroupContext.Provider>
   );
 };
