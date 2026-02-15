@@ -69,60 +69,58 @@ const Home = () => {
   };
 
   return (
-    <View>
+    <View className="flex-1">
       <TotalExpenseCard
         totalExpense={totalExpense ?? 0}
         status={group.Status}
       />
 
-      <View>
-        <View className="ml-6">
-          <CommonTitleGroups text="Expenses" />
-        </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#101828"
-            />
-          }
-          contentContainerStyle={{ paddingBottom: 120 }}
-        >
-          {allExpenses.map((expense) => {
-            const { date, time } = formatDate(expense.date);
-            const paidByNames = expense.paidBy
-              .map((payment) => payment.paidByUserName)
-              .join(", ");
-            return (
-              <View
-                key={expense.id}
-                className="bg-white w-auto rounded-3xl p-6 shadow-sm mx-6 mb-3"
-              >
-                <View className="flex-col">
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-xl">{expense.description}</Text>
-                    <Text className="text-xl font-bold">
-                      NPR {expense.amount}
-                    </Text>
-                  </View>
+      <View className="ml-6">
+        <CommonTitleGroups text="Expenses" />
+      </View>
 
-                  <View className="flex-row items-center justify-between mt-5">
-                    <Text>{expense.categoryName}</Text>
+      <ScrollView
+        className="flex-1" // Add this
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#101828"
+          />
+        }
+        contentContainerStyle={{ paddingBottom: 120 }}
+      >
+        {allExpenses.map((expense) => {
+          const { date, time } = formatDate(expense.date);
+          const paidByNames = expense.paidBy
+            .map((payment) => payment.paidByUserName)
+            .join(", ");
+          return (
+            <View
+              key={expense.id}
+              className="bg-white w-auto rounded-3xl p-6 shadow-sm mx-6 mb-3"
+            >
+              <View className="flex-col">
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-xl">{expense.description}</Text>
+                  <Text className="text-xl font-bold">
+                    NPR {expense.amount}
+                  </Text>
+                </View>
 
-                    <Text className="text-gray-500">{paidByNames}</Text>
-
-                    <View>
-                      <Text className="text-gray-500">{date}</Text>
-                    </View>
+                <View className="flex-row items-center justify-between mt-5">
+                  <Text>{expense.categoryName}</Text>
+                  <Text className="text-gray-500">{paidByNames}</Text>
+                  <View>
+                    <Text className="text-gray-500">{date}</Text>
                   </View>
                 </View>
               </View>
-            );
-          })}
-        </ScrollView>
-      </View>
+            </View>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 };
