@@ -1,6 +1,7 @@
 package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.GroupDto;
+import com.intern.splitra.dto.GroupMemberDto;
 import com.intern.splitra.mapper.GroupMapper;
 import com.intern.splitra.model.Groups;
 import com.intern.splitra.model.User;
@@ -86,7 +87,7 @@ public class GroupServiceImpl implements GroupService {
         return new ResponseEntity<>(numberOfMembers, HttpStatus.OK);
     }
 
-    public ResponseEntity<List<String>> getGroupMembers(long groupId, long userId) {
+    public ResponseEntity<List<GroupMemberDto>> getGroupMembers(long groupId, long userId) {
         Groups group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
 
@@ -97,11 +98,11 @@ public class GroupServiceImpl implements GroupService {
             throw new RuntimeException("You are not a member of this group");
         }
 
-        List<String> memberNames = group.getMembers().stream()
-                .map(User::getFullName)
+        List<GroupMemberDto> members = group.getMembers().stream()
+                .map(member -> new GroupMemberDto(member.getId(), member.getFullName()))
                 .toList();
 
-        return new ResponseEntity<>(memberNames, HttpStatus.OK);
+        return new ResponseEntity<>(members, HttpStatus.OK);
     }
 
 }

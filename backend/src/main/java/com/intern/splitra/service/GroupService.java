@@ -1,6 +1,7 @@
 package com.intern.splitra.service;
 
 import com.intern.splitra.dto.GroupDto;
+import com.intern.splitra.dto.GroupMemberDto;
 import com.intern.splitra.model.User;
 import org.springframework.http.ResponseEntity;
 
@@ -13,6 +14,6 @@ public interface GroupService {
     ResponseEntity<GroupDto> joinGroup(String inviteToken, long userId);
     ResponseEntity<String> getInviteLink(long groupId, long userId);
     ResponseEntity<Long> getNumberOfMembers(long groupId);
-    ResponseEntity<List<String>> getGroupMembers(long groupId, long userId);
+    ResponseEntity<List<GroupMemberDto>> getGroupMembers(long groupId, long userId);
 
 }
