@@ -1,14 +1,13 @@
 import axiosInstance from './axiosConfig';
 
-export interface Category{
-  id: number;
-  name: string;
+export interface ExpensePayment{
+    id: number;
+    expenseId: number;
+    paidByUserId: number;
+    paidByUserName: string; 
+    amountPaid: number;
 }
 
-export interface User{
-  id: number;
-  name: string;
-}
 
 export interface TotalExpenseByGroup{
     totalExpense: number;
@@ -18,8 +17,12 @@ export interface Expense{
     id: number;
     description: string;
     amount: number;
-    category: Category;
-    paidBy: User[];
+    createdByUsername: string;
+    categoryName: string;
+    paidBy: ExpensePayment[];
+    date: string;
+    
+
 
 }
 
