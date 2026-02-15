@@ -85,11 +85,20 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public ResponseEntity<List<CategoryDto>> getCategoriesByGroupId(Long groupId) {
-        List<CategoryDto> categories = categoryRepo.findAllByGroupId(groupId).stream()
+        List<CategoryDto> groupCategories = categoryRepo.findAllByGroupId(groupId).stream()
                 .map(categoryMapper ::toDto)
                 .toList();
 
-        return new ResponseEntity<>(categories, HttpStatus.OK);
+        List<CategoryDto> globalCategories = categoryRepo.findByGroupIsNull().stream()
+                .map(categoryMapper::toDto)
+                .toList();
+
+
+        List<CategoryDto> allCategories = new ArrayList<>();
+        allCategories.addAll(globalCategories);
+        allCategories.addAll(groupCategories);
+
+        return new ResponseEntity<>(allCategories, HttpStatus.OK);
     }
 
 }
