@@ -12,6 +12,7 @@ public interface ExpensePaymentMapper {
 
     @Mapping(source="expense.id", target="expenseId")
     @Mapping(source="paidBy.id", target="paidByUserId")
+    @Mapping(source="paidBy.fullName", target="paidByUserName")
     ExpensePaymentDto toDto(ExpensePayment expensePayment);
 
     @Mapping(source="expenseId", target="expense.id")

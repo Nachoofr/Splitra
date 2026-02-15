@@ -17,4 +17,7 @@ public class ExpensePaymentDto {
     private Long paidByUserId;
 
     private Double amountPaid;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String paidByUserName;
 }
