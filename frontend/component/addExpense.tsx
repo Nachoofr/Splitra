@@ -13,7 +13,11 @@ import {
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { groupApi, GroupMember } from "../app/api/groupApi";
-import { expenseApi, ExpensePaymentRequest } from "../app/api/expenseApi";
+import {
+  expenseApi,
+  ExpensePaymentRequest,
+  Expense,
+} from "../app/api/expenseApi";
 import { categoryApi, Category } from "../app/api/categoryApi";
 
 interface AddExpenseModalProps {
@@ -22,6 +26,8 @@ interface AddExpenseModalProps {
   groupId: string;
   groupName: string;
   onExpenseAdded?: () => void;
+  editMode?: boolean;
+  expenseToEdit?: Expense; 
 }
 
 interface PayerAmount {
@@ -49,6 +55,8 @@ const AddExpense = ({
   groupId,
   groupName,
   onExpenseAdded,
+  editMode = false,
+  expenseToEdit,
 }: AddExpenseModalProps) => {
   const [expenseData, setExpenseData] = useState({
     description: "",
@@ -71,6 +79,35 @@ const AddExpense = ({
       fetchCategories();
     }
   }, [visible, groupId]);
+
+  useEffect(() => {
+    if (visible && editMode && expenseToEdit && groupMembers.length > 0) {
+      loadExpenseData();
+    }
+  }, [visible, editMode, expenseToEdit, groupMembers]);
+
+  const loadExpenseData = () => {
+    if (!expenseToEdit) return;
+
+    setExpenseData({
+      description: expenseToEdit.description,
+      amount: expenseToEdit.amount.toString(),
+      date: new Date(expenseToEdit.date).toISOString().split("T")[0],
+      category: expenseToEdit.category || 0,
+      splitMethod: expenseToEdit.splitMethod || "EQUALLY",
+    });
+
+    const payersWithAmounts: PayerAmount[] = expenseToEdit.paidBy.map(
+      (payment) => {
+        const member = groupMembers.find((m) => m.id === payment.paidByUserId);
+        return {
+          name: member?.name || payment.paidByUserName,
+          amount: payment.amountPaid.toString(),
+        };
+      },
+    );
+    setSelectedPayers(payersWithAmounts);
+  };
 
   const fetchGroupMembers = async () => {
     setIsLoadingMembers(true);
@@ -221,7 +258,7 @@ const AddExpense = ({
     return true;
   };
 
-  const handleAddExpense = async () => {
+  const handleSubmit = async () => {
     if (!validateExpense()) return;
 
     try {
@@ -240,30 +277,37 @@ const AddExpense = ({
         },
       );
 
-      const response = await expenseApi.addExpense(
-        {
-          description: expenseData.description,
-          amount: parseFloat(expenseData.amount),
-          date: expenseData.date,
-          category: expenseData.category,
-          splitMethod: expenseData.splitMethod,
-          paidBy: paidByData,
-        },
-        Number(groupId),
-      );
+      const requestData = {
+        description: expenseData.description,
+        amount: parseFloat(expenseData.amount),
+        date: expenseData.date,
+        category: expenseData.category,
+        splitMethod: expenseData.splitMethod,
+        paidBy: paidByData,
+      };
 
-      console.log("Expense added:", response);
+      if (editMode && expenseToEdit) {
+        await expenseApi.updateExpense(
+          expenseToEdit.id,
+          Number(groupId),
+          requestData,
+        );
+        Alert.alert("Success", "Expense updated successfully!");
+      } else {
+        await expenseApi.addExpense(requestData, Number(groupId));
+        Alert.alert("Success", "Expense added successfully!");
+      }
 
-      Alert.alert("Success", "Expense added successfully!");
       handleClose();
       if (onExpenseAdded) {
         onExpenseAdded();
       }
     } catch (error: any) {
-      console.error("Error adding expense:", error);
+      console.error("Error saving expense:", error);
       Alert.alert(
         "Error",
-        error.response?.data?.message || "Failed to add expense",
+        error.response?.data?.message ||
+          `Failed to ${editMode ? "update" : "add"} expense`,
       );
     } finally {
       setIsSubmitting(false);
@@ -300,7 +344,7 @@ const AddExpense = ({
                 </Pressable>
                 <View className="ml-6 flex-1">
                   <Text className="text-white text-3xl font-semibold">
-                    Add Expense
+                    {editMode ? "Edit Expense" : "Add Expense"}
                   </Text>
                   <Text className="text-[#CAD5E2] text-lg mt-1">
                     to {groupName}
@@ -316,7 +360,6 @@ const AddExpense = ({
             contentContainerStyle={{ paddingBottom: 120 }}
             keyboardShouldPersistTaps="handled"
           >
-
             <View className="bg-white rounded-3xl p-6 mx-6 mt-6 shadow-sm">
               <Text className="text-2xl font-bold text-gray-900 mb-6">
                 Expense Details
@@ -620,7 +663,7 @@ const AddExpense = ({
 
           <View className="absolute bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-200">
             <Pressable
-              onPress={handleAddExpense}
+              onPress={handleSubmit}
               className="bg-primary py-4 rounded-2xl items-center"
               disabled={isLoadingMembers || isSubmitting || isLoadingCategories}
             >
@@ -628,7 +671,7 @@ const AddExpense = ({
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text className="text-white font-semibold text-lg">
-                  Add Expense
+                  {editMode ? "Update Expense" : "Add Expense"}
                 </Text>
               )}
             </Pressable>

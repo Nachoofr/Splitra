@@ -18,6 +18,7 @@ interface ExpenseDetailsModalProps {
   groupName: string;
   groupId: number;
   onExpenseDeleted?: () => void;
+  onExpenseEdit?: () => void;
 }
 
 const ExpenseDetailsModal = ({
@@ -27,6 +28,7 @@ const ExpenseDetailsModal = ({
   groupName,
   groupId,
   onExpenseDeleted,
+  onExpenseEdit,
 }: ExpenseDetailsModalProps) => {
   const [expense, setExpense] = useState<Expense | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,12 @@ const ExpenseDetailsModal = ({
     }
   };
 
-  const handleEdit = () => {};//TODO
+  const handleEdit = () => {
+    onClose();
+    if (onExpenseEdit) {
+      onExpenseEdit();
+    }
+  }; 
 
   const handleDelete = () => {
     Alert.alert(
@@ -187,12 +194,22 @@ const ExpenseDetailsModal = ({
 
               <View className="mx-6 mt-6">
                 <Text className="text-gray-500 text-lg mb-2">
+                  Split Method
+                </Text>
+                <View className="bg-white rounded-3xl p-6 shadow-sm">
+                  <Text className="text-gray-900 text-xl">
+                    {expense.splitMethod}
+                  </Text>
+                </View>
+              </View>
+
+              <View className="mx-6 mt-6">
+                <Text className="text-gray-500 text-lg mb-2">
                   Split Between
                 </Text>
                 <View className="bg-white rounded-3xl p-6 shadow-sm">
                   <Text className="text-gray-900 text-xl">
-                    {/* TODO: Add split details once available from backend */}
-                    Split equally among group members
+                    members names
                   </Text>
                 </View>
               </View>

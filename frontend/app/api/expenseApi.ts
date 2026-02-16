@@ -36,6 +36,8 @@ export interface Expense{
     categoryName: string;
     paidBy: ExpensePayment[];
     date: string;
+    category: number;
+    splitMethod: string;
 }
 
 export const expenseApi = {
@@ -91,4 +93,21 @@ export const expenseApi = {
     throw error;
       }
       },
+
+    updateExpense: async (expenseId: number, groupId: number, data: AddExpenseRequest): Promise<Expense> => {
+      try {
+      const response = await axiosInstance.post<Expense>(`/splitra/expenses/${expenseId}/group/${groupId}`,
+      {
+        description: data.description,
+        amount: data.amount,
+        category: data.category,
+        splitMethod: data.splitMethod,
+        paidBy: data.paidBy
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
     }

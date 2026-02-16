@@ -6,12 +6,12 @@ import {
   Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import { Expense, expenseApi } from "../../api/expenseApi";
 import { useGroup } from "./groupContext";
 import TotalExpenseCard from "../../../component/totalExpensesCard";
 import CommonTitleGroups from "../../../component/commonTitleGroups";
 import ExpenseDetailsModal from "../../../component/expenseDetails";
+import AddExpenseModal from "../../../component/addExpense";
 
 const Home = () => {
   const { group } = useGroup();
@@ -23,6 +23,9 @@ const Home = () => {
   const [selectedExpenseId, setSelectedExpenseId] = useState<number | null>(
     null,
   );
+  const [showAddExpense, setShowAddExpense] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -148,10 +151,35 @@ const Home = () => {
           groupId={Number(group.id)}
           onExpenseDeleted={() => {
             fetchAllExpenses(Number(group.id));
-            fetchTotalExpense(Number(group.id))
+            fetchTotalExpense(Number(group.id));
+          }}
+          onExpenseEdit={() => {
+            const expense = allExpenses.find((e) => e.id === selectedExpenseId);
+            if (expense) {
+              setExpenseToEdit(expense);
+              setEditMode(true);
+              setShowAddExpense(true);
+            }
           }}
         />
       )}
+
+      <AddExpenseModal
+        visible={showAddExpense}
+        onClose={() => {
+          setShowAddExpense(false);
+          setEditMode(false);
+          setExpenseToEdit(null);
+        }}
+        groupId={group.id.toString()}
+        groupName={group.groupName}
+        editMode={editMode}
+        expenseToEdit={expenseToEdit || undefined}
+        onExpenseAdded={() => {
+          fetchAllExpenses(Number(group.id));
+          fetchTotalExpense(Number(group.id));
+        }}
+      />
     </View>
   );
 };
