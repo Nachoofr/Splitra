@@ -68,9 +68,27 @@ export const expenseApi = {
         paidBy: data.paidBy
       }
     );
-    return response.data;
-  } catch (error) {
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+    },
+
+    getExpenseById: async (expenseId: number): Promise<Expense> => {
+      try {
+        const response = await axiosInstance.get<Expense>(`/splitra/expenses/${expenseId}`);
+        return response.data;
+      } catch (error) {
     throw error;
   }
 },
+
+    deleteExpense: async (expenseId: number, groupId: number): Promise<void> => {
+      try {
+        const response = await axiosInstance.delete<void>(`/splitra/expenses/${expenseId}/group/${groupId}`);
+        return response.data;
+      } catch (error) {
+    throw error;
+      }
+      },
     }

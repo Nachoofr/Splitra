@@ -1,10 +1,17 @@
-import { Text, View, ScrollView, RefreshControl } from "react-native";
+import {
+  Text,
+  View,
+  ScrollView,
+  RefreshControl,
+  Pressable,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Expense, expenseApi } from "../../api/expenseApi";
 import { useGroup } from "./groupContext";
 import TotalExpenseCard from "../../../component/totalExpensesCard";
 import CommonTitleGroups from "../../../component/commonTitleGroups";
+import ExpenseDetailsModal from "../../../component/expenseDetails";
 
 const Home = () => {
   const { group } = useGroup();
@@ -12,6 +19,10 @@ const Home = () => {
   const [totalExpense, setTotalExpense] = useState<number>();
   const [refreshing, setRefreshing] = useState(false);
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
+  const [showExpenseDetails, setShowExpenseDetails] = useState(false);
+  const [selectedExpenseId, setSelectedExpenseId] = useState<number | null>(
+    null,
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -80,7 +91,7 @@ const Home = () => {
       </View>
 
       <ScrollView
-        className="flex-1" // Add this
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -97,9 +108,13 @@ const Home = () => {
             .map((payment) => payment.paidByUserName)
             .join(", ");
           return (
-            <View
+            <Pressable
               key={expense.id}
               className="bg-white w-auto rounded-3xl p-6 shadow-sm mx-6 mb-3"
+              onPress={() => {
+                setSelectedExpenseId(expense.id);
+                setShowExpenseDetails(true);
+              }}
             >
               <View className="flex-col">
                 <View className="flex-row items-center justify-between">
@@ -117,10 +132,26 @@ const Home = () => {
                   </View>
                 </View>
               </View>
-            </View>
+            </Pressable>
           );
         })}
       </ScrollView>
+      {selectedExpenseId && (
+        <ExpenseDetailsModal
+          visible={showExpenseDetails}
+          onClose={() => {
+            setShowExpenseDetails(false);
+            setSelectedExpenseId(null);
+          }}
+          expenseId={selectedExpenseId}
+          groupName={group.groupName}
+          groupId={Number(group.id)}
+          onExpenseDeleted={() => {
+            fetchAllExpenses(Number(group.id));
+            fetchTotalExpense(Number(group.id))
+          }}
+        />
+      )}
     </View>
   );
 };
