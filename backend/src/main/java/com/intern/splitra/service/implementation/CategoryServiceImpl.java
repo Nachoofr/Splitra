@@ -66,7 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
         Groups group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
 
-        if (group.getMembers().stream().anyMatch(member -> member.getId() == userId)) {
+        if (!group.getMembers().stream().anyMatch(member -> member.getId() == userId)) {
             throw new RuntimeException("User is not a member of the group");
         }
 
