@@ -52,5 +52,9 @@ public class ExpenseController {
         return expenseService.deleteExpense(groupId, userId, expenseId);
     }
 
-
+    @GetMapping(ExpenseApiEndpointConstants.EXPENSES_ID)
+    public ResponseEntity<ExpenseDto> getExpenseById (@AuthenticationPrincipal UserPrinciple userPrinciple, @PathVariable Long expenseId) {
+        long userId = userPrinciple.getUser().getId();
+        return expenseService.getExpenseById(expenseId, userId);
+    }
 }

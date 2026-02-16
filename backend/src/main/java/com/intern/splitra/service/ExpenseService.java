@@ -13,4 +13,5 @@ public interface ExpenseService {
     ResponseEntity<Double> getTotalExpenseByGroup(long groupId, long userId);
     ResponseEntity<ExpenseDto> editExpense(long groupId, long userId, long expenseId, ExpenseDto expenseDto);
     ResponseEntity<Void> deleteExpense(long groupId, long userId, long expenseId);
+    ResponseEntity<ExpenseDto> getExpenseById(long expenseId, long userId);
 }

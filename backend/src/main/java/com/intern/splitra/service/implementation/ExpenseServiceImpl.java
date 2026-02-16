@@ -247,5 +247,21 @@ public class ExpenseServiceImpl implements ExpenseService {
         expenseRepo.delete(expense);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    public ResponseEntity<ExpenseDto> getExpenseById(long expenseId, long userId) {
+        Expense expense = expenseRepo.findById(expenseId)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+        Groups group = expense.getGroup();
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().stream().anyMatch(member -> member.getId() == userId)) {
+            throw new RuntimeException("User is not a member of the group");
+        }
+
+        return new ResponseEntity<>(expenseMapper.toDto(expense), HttpStatus.OK);
+    }
 }
 
