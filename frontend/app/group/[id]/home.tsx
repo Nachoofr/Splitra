@@ -114,7 +114,7 @@ const Home = () => {
             <Pressable
               key={expense.id}
               className="bg-white w-auto rounded-3xl p-6 shadow-sm mx-6 mb-3"
-              onPress={() => {
+              onPress={() => {  
                 setSelectedExpenseId(expense.id);
                 setShowExpenseDetails(true);
               }}
