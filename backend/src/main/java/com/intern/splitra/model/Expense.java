@@ -13,8 +13,8 @@ import java.util.*;
 
 @Entity
 @Data
-@EqualsAndHashCode(exclude = {"paidBy", "group"})
-@ToString(exclude = {"paidBy", "group"})
+@EqualsAndHashCode(exclude = {"paidBy", "group", "splits"})
+@ToString(exclude = {"paidBy", "group", "splits"})
 public class Expense {
 
     @Id
@@ -38,6 +38,9 @@ public class Expense {
 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExpensePayment> paidBy = new HashSet<>();
+
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ExpenseSplit> splits = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
