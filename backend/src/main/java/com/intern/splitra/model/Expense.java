@@ -55,16 +55,4 @@ public class Expense {
     @NotNull
     private User createdBy;
 
-    //for now comment, will be used after implementing split logic
-//    @ElementCollection
-//    @CollectionTable(
-//            name = "expense_split_amounts",
-//            joinColumns = @JoinColumn(name = "expense_id")
-//    )
-//    @MapKeyJoinColumn(name = "user_id")
-//    @Column(name = "amount_owed")
-//    private Map<User, Double> splitAmounts = new HashMap<>();
-
-
-
 }

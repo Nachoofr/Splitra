@@ -1,6 +1,7 @@
 package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.ExpenseSplitDto;
+import com.intern.splitra.dto.ExpenseSplitRequestDto;
 import com.intern.splitra.mapper.ExpenseSplitMapper;
 import com.intern.splitra.model.Expense;
 import com.intern.splitra.model.ExpenseSplit;
@@ -11,6 +12,7 @@ import com.intern.splitra.repository.ExpenseSplitRepo;
 import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.ExpenseSplitService;
 import lombok.AllArgsConstructor;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -60,7 +62,7 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             ExpenseSplit expenseSplit = new ExpenseSplit();
-            expenseSplit.setExpenseId(expense);
+            expenseSplit.setExpense(expense);
             expenseSplit.setUserId(user);
             expenseSplit.setAmount(splitAmount);
 
@@ -76,6 +78,17 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
                 .toList();
 
         return new ResponseEntity<>(splitDto, HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<ExpenseSplitDto>> splitExpense(Expense expense, ExpenseSplitRequestDto expenseSplitRequestDto, User user){
+        var splitMethod = expense.getSplitMethod();
+        return switch (splitMethod) {
+            case EQUALLY -> equalSplit(expense.getId(), expenseSplitRequestDto.getEqualSplitId(), user.getId());
+            default -> throw new RuntimeException("Invalid splitMethod");
+//            case PERCENTWISE ->
+//            case ITEMWISE ->
+        };
+
     }
 
 

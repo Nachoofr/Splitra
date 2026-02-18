@@ -8,12 +8,12 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ExpenseSplitMapper {
 
-    @Mapping(source="expenseId.id", target="expenseId")
+    @Mapping(source="expense.id", target="expenseId")
     @Mapping(source="userId.id", target="userId")
     @Mapping(source="userId.fullName", target="userName")
     ExpenseSplitDto toDto(ExpenseSplit expenseSplit);
 
-    @Mapping(source="expenseId", target="expenseId.id")
+    @Mapping(source="expenseId", target="expense.id")
     @Mapping(source="userId", target="userId.id")
     ExpenseSplit toEntity(ExpenseSplitDto expenseSplitDto);
 }

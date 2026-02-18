@@ -10,6 +10,7 @@ import com.intern.splitra.repository.ExpenseRepo;
 import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.ExpenseService;
+import com.intern.splitra.service.ExpenseSplitService;
 import enums.GroupStatus;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseRepo expenseRepo;
     private final ExpenseMapper expenseMapper;
     private final GroupRepo groupRepo;
+    private final ExpenseSplitService expenseSplitService;
 
 
     @Transactional
@@ -94,6 +96,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
         expense.setPaidBy(payments);
         expenseRepo.save(expense);
+
+        expenseSplitService.splitExpense(expense, expenseDto.getSplitRequest(), user);
         return new ResponseEntity<>(expenseMapper.toDto(expense), HttpStatus.CREATED);
     }
 

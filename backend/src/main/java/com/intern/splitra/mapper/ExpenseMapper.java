@@ -23,6 +23,7 @@ public interface ExpenseMapper {
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "paidBy", ignore = true)
+    @Mapping(target = "splits", ignore = true)
     Expense toEntity(ExpenseDto expenseDto);
 
 
@@ -31,5 +32,6 @@ public interface ExpenseMapper {
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "paidBy", ignore = true)
+    @Mapping(target = "splits", ignore = true)
     Expense update(ExpenseDto expenseDto, @MappingTarget Expense expense);
 }

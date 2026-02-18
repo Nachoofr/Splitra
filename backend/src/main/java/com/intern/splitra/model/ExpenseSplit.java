@@ -8,8 +8,8 @@ import lombok.ToString;
 
 @Entity
 @Data
-@EqualsAndHashCode(exclude = {"expenseId"})
-@ToString(exclude = {"expenseId"})
+@EqualsAndHashCode(exclude = {"expense"})
+@ToString(exclude = {"expense"})
 public class ExpenseSplit {
 
     @Id
@@ -18,7 +18,7 @@ public class ExpenseSplit {
 
     @ManyToOne
     @JoinColumn(name = "expense_id", nullable = false)
-    private Expense expenseId;
+    private Expense expense;
 
     @NotNull
     @ManyToOne

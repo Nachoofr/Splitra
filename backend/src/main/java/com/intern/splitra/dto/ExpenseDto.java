@@ -39,4 +39,7 @@ public class ExpenseDto {
     private LocalDateTime date;
 
     private Set<ExpensePaymentDto> paidBy;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private ExpenseSplitRequestDto splitRequest;
 }
