@@ -68,7 +68,11 @@ const Home = () => {
     try {
       setError(null);
       const data = await expenseApi.getAllExpenses(groupId);
-      setAllExpenses(data);
+      setAllExpenses(
+        data.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        ),
+      );
     } catch (err: any) {
       setError("Failed to load expenses");
       console.error(err);
@@ -114,7 +118,7 @@ const Home = () => {
             <Pressable
               key={expense.id}
               className="bg-white w-auto rounded-3xl p-6 shadow-sm mx-6 mb-3"
-              onPress={() => {  
+              onPress={() => {
                 setSelectedExpenseId(expense.id);
                 setShowExpenseDetails(true);
               }}
