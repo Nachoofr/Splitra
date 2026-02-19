@@ -590,7 +590,7 @@ const AddExpense = ({
                         : "text-gray-900"
                     }`}
                   >
-                    Split by Amount
+                    Split Itemwise
                   </Text>
                 </Pressable>
                 <Pressable
