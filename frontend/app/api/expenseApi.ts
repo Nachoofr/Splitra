@@ -21,6 +21,9 @@ export interface AddExpenseRequest{
   category: number;
   paidBy: ExpensePaymentRequest[];
   splitMethod: string;
+  splitRequest?: {
+      equalSplitId?: number[];
+    } 
 }
 
 
@@ -67,7 +70,8 @@ export const expenseApi = {
         amount: data.amount,
         category: data.category,
         splitMethod: data.splitMethod,
-        paidBy: data.paidBy
+        paidBy: data.paidBy,
+        splitRequest: data.splitRequest,
       }
     );
       return response.data;

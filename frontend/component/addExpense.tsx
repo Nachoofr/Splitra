@@ -27,7 +27,7 @@ interface AddExpenseModalProps {
   groupName: string;
   onExpenseAdded?: () => void;
   editMode?: boolean;
-  expenseToEdit?: Expense; 
+  expenseToEdit?: Expense;
 }
 
 interface PayerAmount {
@@ -72,6 +72,15 @@ const AddExpense = ({
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [splitMembers, setSplitMembers] = useState<number[]>([]);
+
+  const toggleSplitMember = (memberId: number) => {
+    if (splitMembers.includes(memberId)) {
+      setSplitMembers(splitMembers.filter((id) => id !== memberId));
+    } else {
+      setSplitMembers([...splitMembers, memberId]);
+    }
+  };
 
   useEffect(() => {
     if (visible && groupId) {
@@ -206,6 +215,7 @@ const AddExpense = ({
       splitMethod: "EQUALLY",
     });
     setSelectedPayers([]);
+    setSplitMembers([]);
     setShowCategoryDropdown(false);
   };
 
@@ -237,6 +247,11 @@ const AddExpense = ({
         Alert.alert("Error", `Please enter a valid amount for ${payer.name}`);
         return false;
       }
+    }
+
+    if (expenseData.splitMethod === "EQUALLY" && splitMembers.length < 2) {
+      Alert.alert("Error", "Please select at least 2 members to split with");
+      return false;
     }
 
     const totalPaid = selectedPayers.reduce(
@@ -284,7 +299,11 @@ const AddExpense = ({
         category: expenseData.category,
         splitMethod: expenseData.splitMethod,
         paidBy: paidByData,
+        splitRequest: {
+          equalSplitId: splitMembers,
+        },
       };
+
 
       if (editMode && expenseToEdit) {
         await expenseApi.updateExpense(
@@ -559,6 +578,123 @@ const AddExpense = ({
               </View>
             </View>
 
+            {expenseData.splitMethod === "EQUALLY" && (
+              <View className="bg-white rounded-3xl p-6 mx-6 mt-4 shadow-sm">
+                <Text className="text-2xl font-bold text-gray-900 mb-2">
+                  Split With
+                </Text>
+                <Text className="text-gray-500 text-base mb-4">
+                  Select at least 2 members to split with
+                </Text>
+
+                {isLoadingMembers ? (
+                  <View className="py-8 items-center">
+                    <ActivityIndicator size="large" color="#1F2937" />
+                    <Text className="text-gray-500 mt-2">
+                      Loading members...
+                    </Text>
+                  </View>
+                ) : groupMembers.length === 0 ? (
+                  <View className="py-8 items-center">
+                    <Text className="text-gray-500">
+                      No members found in this group
+                    </Text>
+                  </View>
+                ) : (
+                  <View className="gap-3">
+                    {groupMembers.map((member) => {
+                      const isSelected = splitMembers.includes(member.id);
+
+                      return (
+                        <Pressable
+                          key={member.id}
+                          onPress={() => toggleSplitMember(member.id)}
+                          className={`px-6 py-4 rounded-2xl border-2 flex-row items-center justify-between ${
+                            isSelected
+                              ? "bg-primary border-primary"
+                              : "bg-white border-gray-200"
+                          }`}
+                        >
+                          <View className="flex-row items-center gap-3">
+                            <View
+                              className={`w-10 h-10 rounded-full items-center justify-center ${
+                                isSelected ? "bg-white/20" : "bg-gray-100"
+                              }`}
+                            >
+                              <Text
+                                className={`text-base font-bold ${
+                                  isSelected ? "text-white" : "text-gray-600"
+                                }`}
+                              >
+                                {member.name.charAt(0).toUpperCase()}
+                              </Text>
+                            </View>
+                            <Text
+                              className={`text-lg font-medium ${
+                                isSelected ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {member.name}
+                            </Text>
+                          </View>
+
+                          {isSelected ? (
+                            <Ionicons
+                              name="checkmark-circle"
+                              size={24}
+                              color="white"
+                            />
+                          ) : (
+                            <Ionicons
+                              name="ellipse-outline"
+                              size={24}
+                              color="#9CA3AF"
+                            />
+                          )}
+                        </Pressable>
+                      );
+                    })}
+
+                    {/* Select All / Deselect All */}
+                    <Pressable
+                      onPress={() => {
+                        if (splitMembers.length === groupMembers.length) {
+                          setSplitMembers([]);
+                        } else {
+                          setSplitMembers(groupMembers.map((m) => m.id));
+                        }
+                      }}
+                      className="mt-2 py-3 rounded-2xl border-2 border-primary items-center"
+                    >
+                      <Text className="text-primary font-semibold text-base">
+                        {splitMembers.length === groupMembers.length
+                          ? "Deselect All"
+                          : "Select All"}
+                      </Text>
+                    </Pressable>
+
+                    {/* Counter */}
+                    {splitMembers.length > 0 && (
+                      <View className="mt-2 p-4 bg-gray-50 rounded-2xl">
+                        <Text className="text-sm font-medium text-gray-700">
+                          Selected:{" "}
+                          <Text className="text-primary">
+                            {splitMembers.length} member
+                            {splitMembers.length > 1 ? "s" : ""}
+                          </Text>
+                        </Text>
+                        {splitMembers.length === 1 && (
+                          <Text className="text-xs text-red-400 mt-1">
+                            ⚠️ Select at least 1 more member
+                          </Text>
+                        )}
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+            )}
+
             <View className="bg-white rounded-3xl p-6 mx-6 mt-4 shadow-sm">
               <Text className="text-2xl font-bold text-gray-900 mb-2">
                 Who Paid?
@@ -596,18 +732,40 @@ const AddExpense = ({
                               : "bg-white border-gray-200"
                           }`}
                         >
-                          <Text
-                            className={`text-lg font-medium ${
-                              isSelected ? "text-white" : "text-gray-900"
-                            }`}
-                          >
-                            {member.name}
-                          </Text>
-                          {isSelected && (
+                          <View className="flex-row items-center gap-3">
+                            <View
+                              className={`w-10 h-10 rounded-full items-center justify-center ${
+                                isSelected ? "bg-white/20" : "bg-gray-100"
+                              }`}
+                            >
+                              <Text
+                                className={`text-base font-bold ${
+                                  isSelected ? "text-white" : "text-gray-600"
+                                }`}
+                              >
+                                {member.name.charAt(0).toUpperCase()}
+                              </Text>
+                            </View>
+                            <Text
+                              className={`text-lg font-medium ${
+                                isSelected ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {member.name}
+                            </Text>
+                          </View>
+
+                          {isSelected ? (
                             <Ionicons
                               name="checkmark-circle"
                               size={24}
                               color="white"
+                            />
+                          ) : (
+                            <Ionicons
+                              name="ellipse-outline"
+                              size={24}
+                              color="#9CA3AF"
                             />
                           )}
                         </Pressable>
