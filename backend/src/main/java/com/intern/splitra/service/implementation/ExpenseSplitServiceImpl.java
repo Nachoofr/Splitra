@@ -146,4 +146,21 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
     }
 
 
+    public ResponseEntity<Map<String, Double>> getSplitDetails(long expenseId){
+        List<ExpenseSplit> expenseSplits = expenseSplitRepo.findAllByExpenseId(expenseId);
+
+        Map<String, Double> splitDetails = new HashMap<>();
+
+        for (ExpenseSplit expenseSplit : expenseSplits) {
+            String userName = expenseSplit.getUserId().getFullName();
+            double amount = expenseSplit.getAmount();
+            splitDetails.put(userName, amount);
+        }
+
+        System.out.println(splitDetails);
+
+        return new ResponseEntity<>(splitDetails, HttpStatus.OK);
+    }
+
+
 }
