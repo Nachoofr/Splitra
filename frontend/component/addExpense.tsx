@@ -73,10 +73,27 @@ const AddExpense = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [splitMembers, setSplitMembers] = useState<number[]>([]);
+  const [percentageSplits, setPercentageSplits] = useState<
+    Record<number, string>
+  >({});
+
+  const updatePercentage = (memberId: number, value: string) => {
+    setPercentageSplits((prev) => ({ ...prev, [memberId]: value }));
+  };
+
+  const totalPercentage = splitMembers.reduce(
+    (sum, id) => sum + parseFloat(percentageSplits[id] || "0"),
+    0,
+  );
 
   const toggleSplitMember = (memberId: number) => {
     if (splitMembers.includes(memberId)) {
       setSplitMembers(splitMembers.filter((id) => id !== memberId));
+      setPercentageSplits((prev) => {
+        const updated = { ...prev };
+        delete updated[memberId];
+        return updated;
+      });
     } else {
       setSplitMembers([...splitMembers, memberId]);
     }
@@ -217,6 +234,7 @@ const AddExpense = ({
     setSelectedPayers([]);
     setSplitMembers([]);
     setShowCategoryDropdown(false);
+    setPercentageSplits({});
   };
 
   const handleClose = () => {
@@ -252,6 +270,20 @@ const AddExpense = ({
     if (expenseData.splitMethod === "EQUALLY" && splitMembers.length < 2) {
       Alert.alert("Error", "Please select at least 2 members to split with");
       return false;
+    }
+
+    if (expenseData.splitMethod === "PERCENTWISE") {
+      if (splitMembers.length < 2) {
+        Alert.alert("Error", "Please select at least 2 members to split with");
+        return false;
+      }
+      if (Math.abs(totalPercentage - 100) > 0.01) {
+        Alert.alert(
+          "Error",
+          `Percentages must add up to 100% (currently ${totalPercentage.toFixed(1)}%)`,
+        );
+        return false;
+      }
     }
 
     const totalPaid = selectedPayers.reduce(
@@ -300,10 +332,19 @@ const AddExpense = ({
         splitMethod: expenseData.splitMethod,
         paidBy: paidByData,
         splitRequest: {
-          equalSplitId: splitMembers,
+          equalSplitId:
+            expenseData.splitMethod === "EQUALLY" ? splitMembers : [],
+          percentageSplitId:
+            expenseData.splitMethod === "PERCENTWISE"
+              ? Object.fromEntries(
+                  splitMembers.map((id) => [
+                    id,
+                    parseFloat(percentageSplits[id] || "0"),
+                  ]),
+                )
+              : {},
         },
       };
-
 
       if (editMode && expenseToEdit) {
         await expenseApi.updateExpense(
@@ -578,13 +619,16 @@ const AddExpense = ({
               </View>
             </View>
 
-            {expenseData.splitMethod === "EQUALLY" && (
+            {(expenseData.splitMethod === "EQUALLY" ||
+              expenseData.splitMethod === "PERCENTWISE") && (
               <View className="bg-white rounded-3xl p-6 mx-6 mt-4 shadow-sm">
                 <Text className="text-2xl font-bold text-gray-900 mb-2">
                   Split With
                 </Text>
                 <Text className="text-gray-500 text-base mb-4">
-                  Select at least 2 members to split with
+                  {expenseData.splitMethod === "EQUALLY"
+                    ? "Select at least 2 members to split equally"
+                    : "Select members and enter their percentage"}
                 </Text>
 
                 {isLoadingMembers ? (
@@ -606,56 +650,79 @@ const AddExpense = ({
                       const isSelected = splitMembers.includes(member.id);
 
                       return (
-                        <Pressable
-                          key={member.id}
-                          onPress={() => toggleSplitMember(member.id)}
-                          className={`px-6 py-4 rounded-2xl border-2 flex-row items-center justify-between ${
-                            isSelected
-                              ? "bg-primary border-primary"
-                              : "bg-white border-gray-200"
-                          }`}
-                        >
-                          <View className="flex-row items-center gap-3">
-                            <View
-                              className={`w-10 h-10 rounded-full items-center justify-center ${
-                                isSelected ? "bg-white/20" : "bg-gray-100"
-                              }`}
-                            >
-                              <Text
-                                className={`text-base font-bold ${
-                                  isSelected ? "text-white" : "text-gray-600"
+                        <View key={member.id}>
+                          <Pressable
+                            onPress={() => toggleSplitMember(member.id)}
+                            className={`px-6 py-4 rounded-2xl border-2 flex-row items-center justify-between ${
+                              isSelected
+                                ? "bg-primary border-primary"
+                                : "bg-white border-gray-200"
+                            }`}
+                          >
+                            <View className="flex-row items-center gap-3">
+                              <View
+                                className={`w-10 h-10 rounded-full items-center justify-center ${
+                                  isSelected ? "bg-white/20" : "bg-gray-100"
                                 }`}
                               >
-                                {member.name.charAt(0).toUpperCase()}
+                                <Text
+                                  className={`text-base font-bold ${
+                                    isSelected ? "text-white" : "text-gray-600"
+                                  }`}
+                                >
+                                  {member.name.charAt(0).toUpperCase()}
+                                </Text>
+                              </View>
+                              <Text
+                                className={`text-lg font-medium ${
+                                  isSelected ? "text-white" : "text-gray-900"
+                                }`}
+                              >
+                                {member.name}
                               </Text>
                             </View>
-                            <Text
-                              className={`text-lg font-medium ${
-                                isSelected ? "text-white" : "text-gray-900"
-                              }`}
-                            >
-                              {member.name}
-                            </Text>
-                          </View>
 
-                          {isSelected ? (
-                            <Ionicons
-                              name="checkmark-circle"
-                              size={24}
-                              color="white"
-                            />
-                          ) : (
-                            <Ionicons
-                              name="ellipse-outline"
-                              size={24}
-                              color="#9CA3AF"
-                            />
-                          )}
-                        </Pressable>
+                            {isSelected ? (
+                              <Ionicons
+                                name="checkmark-circle"
+                                size={24}
+                                color="white"
+                              />
+                            ) : (
+                              <Ionicons
+                                name="ellipse-outline"
+                                size={24}
+                                color="#9CA3AF"
+                              />
+                            )}
+                          </Pressable>
+
+                          {isSelected &&
+                            expenseData.splitMethod === "PERCENTWISE" && (
+                              <View className="mt-2 pl-4">
+                                <Text className="text-sm font-medium text-gray-700 mb-2">
+                                  Percentage for {member.name}
+                                </Text>
+                                <View className="flex-row items-center bg-gray-50 rounded-2xl border border-gray-200 px-4 py-3">
+                                  <TextInput
+                                    className="flex-1 text-gray-900"
+                                    placeholder="0"
+                                    placeholderTextColor="#9CA3AF"
+                                    keyboardType="decimal-pad"
+                                    value={percentageSplits[member.id] || ""}
+                                    onChangeText={(text) =>
+                                      updatePercentage(member.id, text)
+                                    }
+                                  />
+                                  <Text className="text-gray-500 font-semibold ml-2">
+                                    %
+                                  </Text>
+                                </View>
+                              </View>
+                            )}
+                        </View>
                       );
                     })}
-
-                    {/* Select All / Deselect All */}
                     <Pressable
                       onPress={() => {
                         if (splitMembers.length === groupMembers.length) {
@@ -673,20 +740,49 @@ const AddExpense = ({
                       </Text>
                     </Pressable>
 
-                    {/* Counter */}
                     {splitMembers.length > 0 && (
                       <View className="mt-2 p-4 bg-gray-50 rounded-2xl">
-                        <Text className="text-sm font-medium text-gray-700">
-                          Selected:{" "}
-                          <Text className="text-primary">
-                            {splitMembers.length} member
-                            {splitMembers.length > 1 ? "s" : ""}
-                          </Text>
-                        </Text>
-                        {splitMembers.length === 1 && (
-                          <Text className="text-xs text-red-400 mt-1">
-                            ⚠️ Select at least 1 more member
-                          </Text>
+                        {expenseData.splitMethod === "EQUALLY" ? (
+                          <>
+                            <Text className="text-sm font-medium text-gray-700">
+                              Selected:{" "}
+                              <Text className="text-primary">
+                                {splitMembers.length} member
+                                {splitMembers.length > 1 ? "s" : ""}
+                              </Text>
+                            </Text>
+                            {splitMembers.length === 1 && (
+                              <Text className="text-xs text-red-400 mt-1">
+                                ⚠️ Select at least 1 more member
+                              </Text>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <Text className="text-sm font-medium text-gray-700">
+                              Total:{" "}
+                              <Text
+                                className={
+                                  totalPercentage === 100
+                                    ? "text-green-600"
+                                    : "text-primary"
+                                }
+                              >
+                                {totalPercentage.toFixed(1)}%
+                              </Text>{" "}
+                              / 100%
+                            </Text>
+                            {totalPercentage !== 100 && (
+                              <Text className="text-xs text-red-400 mt-1">
+                                ⚠️ Percentages must add up to exactly 100%
+                              </Text>
+                            )}
+                            {totalPercentage === 100 && (
+                              <Text className="text-xs text-green-600 mt-1">
+                                ✓ Percentages are balanced
+                              </Text>
+                            )}
+                          </>
                         )}
                       </View>
                     )}
