@@ -33,6 +33,7 @@ const ExpenseDetailsModal = ({
   const [expense, setExpense] = useState<Expense | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [splitDetails, setSplitDetails] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (visible && expenseId) {
@@ -45,6 +46,8 @@ const ExpenseDetailsModal = ({
       setLoading(true);
       setError(null);
       const data = await expenseApi.getExpenseById(expenseId);
+      const splits = await expenseApi.getSplitDetails(expenseId);
+      setSplitDetails(splits);
       setExpense(data);
     } catch (err: any) {
       setError("Failed to load expense details");
@@ -59,7 +62,7 @@ const ExpenseDetailsModal = ({
     if (onExpenseEdit) {
       onExpenseEdit();
     }
-  }; 
+  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -181,9 +184,7 @@ const ExpenseDetailsModal = ({
                           : ""
                       }`}
                     >
-                      <Text className="text-gray-900 text-xl font-medium">
-                        {payment.paidByUserName}
-                      </Text>
+                      <Text className="text-xl">{payment.paidByUserName}</Text>
                       <Text className="text-gray-600 text-lg">
                         NPR {payment.amountPaid.toFixed(2)}
                       </Text>
@@ -193,9 +194,7 @@ const ExpenseDetailsModal = ({
               </View>
 
               <View className="mx-6 mt-6">
-                <Text className="text-gray-500 text-lg mb-2">
-                  Split Method
-                </Text>
+                <Text className="text-gray-500 text-lg mb-2">Split Method</Text>
                 <View className="bg-white rounded-3xl p-6 shadow-sm">
                   <Text className="text-gray-900 text-xl">
                     {expense.splitMethod}
@@ -208,9 +207,23 @@ const ExpenseDetailsModal = ({
                   Split Between
                 </Text>
                 <View className="bg-white rounded-3xl p-6 shadow-sm">
-                  <Text className="text-gray-900 text-xl">
-                    members names
-                  </Text>
+                  {Object.entries(splitDetails).map(
+                    ([name, amount], index, arr) => (
+                      <View
+                        key={name}
+                        className={`flex-row justify-between items-center ${
+                          index !== arr.length - 1
+                            ? "mb-4 pb-4 border-b border-gray-100"
+                            : ""
+                        }`}
+                      >
+                        <Text className="text-xl">{name}</Text>
+                        <Text className="text-gray-600 text-lg">
+                          NPR {amount}
+                        </Text>
+                      </View>
+                    ),
+                  )}
                 </View>
               </View>
 

@@ -113,5 +113,15 @@ export const expenseApi = {
   } catch (error) {
     throw error;
   }
+},
+
+getSplitDetails: async (expenseId: number): Promise<Record<string, number>> => {
+  try{
+    const response = await axiosInstance.get(`/splitra/expense/${expenseId}/split/details`);
+    return response.data;
+  }
+  catch(error){
+    throw error;
+  }
 }
-    }
+}
