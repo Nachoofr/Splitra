@@ -157,8 +157,6 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
             splitDetails.put(userName, amount);
         }
 
-        System.out.println(splitDetails);
-
         return new ResponseEntity<>(splitDetails, HttpStatus.OK);
     }
 
