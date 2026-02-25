@@ -1,6 +1,7 @@
 package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.BalanceDto;
+import com.intern.splitra.dto.ExpenseDto;
 import com.intern.splitra.model.*;
 import com.intern.splitra.repository.ExpenseRepo;
 import com.intern.splitra.repository.GroupRepo;
@@ -10,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,16 +25,11 @@ public class BalanceServiceImpl implements BalanceService {
     ExpenseRepo expenseRepo;
     GroupRepo groupRepo;
 
-    public ResponseEntity<List<BalanceDto>> getGroupBalance(long groupId){
-        Groups group = groupRepo.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
-
+    public Map<Long, Double> calculateNet(Long groupId, Map<Long, String> names) {
         List<Expense> expenses = expenseRepo.findByGroupId(groupId);
 
         Map<Long, Double> paid = new HashMap<>();
         Map<Long, Double> owed = new HashMap<>();
-        Map<Long, String> names = new HashMap<>();
-        Map<Long, Double> netBalance = new HashMap<>();
 
         for (Expense expense : expenses){
             for (ExpensePayment expensePayment : expense.getPaidBy()){
@@ -52,10 +49,23 @@ public class BalanceServiceImpl implements BalanceService {
             }
         }
 
+        Map<Long, Double> netBalance = new HashMap<>();
         for (Long user : names.keySet()){
             double net = paid.getOrDefault(user, 0.0) - owed.getOrDefault(user, 0.0);
             netBalance.put(user,net);
         }
+        return netBalance;
+    }
+
+
+    public ResponseEntity<List<BalanceDto>> getGroupBalance(long groupId){
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+
+        List<Expense> expenses = expenseRepo.findByGroupId(groupId);
+        Map<Long, String> names = new HashMap<>();
+        Map<Long, Double> netBalance = calculateNet(groupId, names);
 
         List<BalanceDto> balance = new ArrayList<>();
         for (long user : names.keySet()){
@@ -67,5 +77,7 @@ public class BalanceServiceImpl implements BalanceService {
         }
         return new ResponseEntity<>(balance, HttpStatus.OK);
     }
+
+
 
 }

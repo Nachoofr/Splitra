@@ -15,7 +15,7 @@ import java.util.List;
 public class BalanceController {
     BalanceService balanceService;
 
-    @GetMapping("splitra/{groupId}")
+    @GetMapping("splitra/balance/{groupId}")
     public ResponseEntity<List<BalanceDto>> getGroupBalance(@PathVariable long groupId){
         return balanceService.getGroupBalance(groupId);
     }
