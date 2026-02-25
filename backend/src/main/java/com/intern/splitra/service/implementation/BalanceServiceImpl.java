@@ -1,7 +1,7 @@
 package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.BalanceDto;
-import com.intern.splitra.dto.ExpenseDto;
+import com.intern.splitra.dto.SettlementDto;
 import com.intern.splitra.model.*;
 import com.intern.splitra.repository.ExpenseRepo;
 import com.intern.splitra.repository.GroupRepo;
@@ -11,12 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -62,8 +58,6 @@ public class BalanceServiceImpl implements BalanceService {
         Groups group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
 
-
-        List<Expense> expenses = expenseRepo.findByGroupId(groupId);
         Map<Long, String> names = new HashMap<>();
         Map<Long, Double> netBalance = calculateNet(groupId, names);
 
@@ -76,6 +70,57 @@ public class BalanceServiceImpl implements BalanceService {
             balance.add(balanceDto);
         }
         return new ResponseEntity<>(balance, HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<SettlementDto>> getSettlements (long groupId){
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        Map<Long, String> names = new HashMap<>();
+        Map<Long, Double> netBalance = calculateNet(groupId, names);
+
+        List<SettlementDto> settlements = new ArrayList<>();
+
+        PriorityQueue<long[]> receiver = new PriorityQueue<>((a,b) -> Long.compare(b[1], a[1]));
+        PriorityQueue<long[]> payer = new PriorityQueue<>((a,b) -> Long.compare(a[1], b[1]));
+
+       for (Map.Entry<Long, Double> entry : netBalance.entrySet()){
+           long userId = entry.getKey();
+           long amount = Math.round(entry.getValue());
+
+           if(amount > 0){
+               receiver.add(new long[]{userId, amount});
+           }
+           else if(amount < 0){
+                payer.add(new long[]{userId, amount});
+           }
+       }
+
+       while(!receiver.isEmpty() && !payer.isEmpty()){
+           long[] credit = receiver.poll();
+           long[] debt = payer.poll();
+
+           long creditAmount = credit[1];
+           long debtAmount = Math.abs(debt[1]);
+
+           long transfer = Math.min(creditAmount, debtAmount);
+
+           settlements.add(new SettlementDto(names.get(debt[0]), names.get(credit[0]), transfer));
+
+           long remainingCredit = creditAmount - transfer;
+           long remainingDebt = debtAmount - transfer;
+
+           if (remainingCredit > 0){
+               receiver.add(new long[]{credit[0], remainingDebt});
+           }
+
+           if (remainingDebt > 0){
+               payer.add(new long[]{debt[0], -remainingDebt});
+           }
+
+       }
+
+       return new ResponseEntity<>(settlements, HttpStatus.OK);
     }
 
 

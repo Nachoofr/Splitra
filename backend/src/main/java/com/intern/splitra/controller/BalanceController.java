@@ -1,6 +1,7 @@
 package com.intern.splitra.controller;
 
 import com.intern.splitra.dto.BalanceDto;
+import com.intern.splitra.dto.SettlementDto;
 import com.intern.splitra.service.BalanceService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,5 +19,10 @@ public class BalanceController {
     @GetMapping("splitra/balance/{groupId}")
     public ResponseEntity<List<BalanceDto>> getGroupBalance(@PathVariable long groupId){
         return balanceService.getGroupBalance(groupId);
+    }
+
+    @GetMapping("splitra/settlements/{groupId}")
+    public ResponseEntity<List<SettlementDto>> getSettlements(@PathVariable long groupId){
+        return balanceService.getSettlements(groupId);
     }
 }
