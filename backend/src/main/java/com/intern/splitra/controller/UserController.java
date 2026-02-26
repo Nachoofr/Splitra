@@ -2,11 +2,13 @@ package com.intern.splitra.controller;
 
 import com.intern.splitra.constant.UserApiEndpointConstants;
 import com.intern.splitra.dto.UserDto;
+import com.intern.splitra.model.SecurityModel.UserPrinciple;
 import com.intern.splitra.model.User;
 import com.intern.splitra.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +33,12 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getAllUsers(){
         var users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping(UserApiEndpointConstants.CURRENT_USER)
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserPrinciple userPrinciple){
+        long userId = userPrinciple.getUser().getId();
+        return userService.getUserById(userId);
     }
 
     @GetMapping(UserApiEndpointConstants.USER_ID)

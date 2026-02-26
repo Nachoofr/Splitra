@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class SettlementDto {
     private String from;
     private String to;
-    private Long Amount;
+    private Long amount;
 }

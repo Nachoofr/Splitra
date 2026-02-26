@@ -9,4 +9,5 @@ public class UserApiEndpointConstants {
     public static final String LOGIN =  USERS + "/login";
     public static final String SIGN_UP = USERS + "/signup";
     public static final String USER_ID = USERS + "/{id}";
+    public static final String CURRENT_USER = USERS + "/current";
 }
