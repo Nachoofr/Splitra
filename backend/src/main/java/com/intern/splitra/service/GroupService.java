@@ -15,5 +15,6 @@ public interface GroupService {
     ResponseEntity<String> getInviteLink(long groupId, long userId);
     ResponseEntity<Long> getNumberOfMembers(long groupId);
     ResponseEntity<List<GroupMemberDto>> getGroupMembers(long groupId, long userId);
+    ResponseEntity<Void> deleteGroup(long groupId, long userId);
 
 }

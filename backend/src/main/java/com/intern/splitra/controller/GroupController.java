@@ -59,4 +59,9 @@ public class GroupController {
         return groupService.getGroupMembers(id, userId);
     }
 
+    @DeleteMapping(GroupApiEndpointConstants.GROUP_ID + "/delete")
+    public ResponseEntity<Void> deleteGroup(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        long userId = userPrinciple.getUser().getId();
+        return groupService.deleteGroup(id, userId);
+    }
 }
