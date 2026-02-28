@@ -64,4 +64,10 @@ public class GroupController {
         long userId = userPrinciple.getUser().getId();
         return groupService.deleteGroup(id, userId);
     }
+
+    @DeleteMapping(GroupApiEndpointConstants.GROUP_ID + "/leave")
+    public ResponseEntity<Void> leaveGroup(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        long userId = userPrinciple.getUser().getId();
+        return groupService.leaveGroup(id, userId);
+    }
 }

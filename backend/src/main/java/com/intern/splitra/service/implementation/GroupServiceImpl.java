@@ -125,4 +125,24 @@ public class GroupServiceImpl implements GroupService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    public ResponseEntity<Void> leaveGroup(long groupId, long userId) {
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().contains(user)) {
+            throw new RuntimeException("You are not a member of this group");
+        }
+
+        if (group.getCreatedBy().getId() == userId) {
+            throw new RuntimeException("Group creator cannot leave the group.");
+        }
+
+        group.getMembers().remove(user);
+        groupRepo.save(group);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
