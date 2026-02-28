@@ -71,6 +71,15 @@ getGroupMembers: async (groupId: number): Promise<GroupMember[]> => {
   } catch (error) {
     throw error;
   }
-}
+},
+
+  deleteGroup: async (groupId: number): Promise<void> => {
+    try {
+      const response = await axiosInstance.delete(`/splitra/groups/${groupId}/delete`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 
 };

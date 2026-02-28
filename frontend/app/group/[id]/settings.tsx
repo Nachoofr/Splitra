@@ -12,9 +12,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useGroup } from "./groupContext";
 import { groupApi, GroupMember } from "../../api/groupApi";
 import CommonTitle from "../../../component/commonTitleGroups";
+import { useRouter } from "expo-router";
 
 const Settings = () => {
   const { group } = useGroup();
+  const router = useRouter();
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteLoading, setInviteLoading] = useState(false);
@@ -35,6 +37,25 @@ const Settings = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteGroup = async () => {
+    Alert.alert(
+      "Delete Group",
+      `Are you sure you want to permanently delete "${group.groupName}"? This cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            const data = await groupApi.deleteGroup(group.id);
+            console.log("Delete group:", group.id);
+            router.replace("(home)/groups");
+          },
+        },
+      ],
+    );
   };
 
   const getInitials = (name: string) =>
@@ -78,7 +99,6 @@ const Settings = () => {
         </Pressable>
       </View>
 
-      {/* Group Members Section */}
       <View className="mt-5">
         <CommonTitle text={"Group Members"} />
       </View>
@@ -109,6 +129,48 @@ const Settings = () => {
           ))}
         </View>
       )}
+
+      <View className="mt-5">
+        <CommonTitle text={"Export Data"} />
+
+        <Pressable
+          // onPress={handleExportCSV}
+          className="bg-white rounded-2xl px-5 py-4 flex-row items-center shadow-sm"
+        >
+          <View className="w-12 h-12 rounded-full bg-blue-50 items-center justify-center mr-4">
+            <Ionicons name="download-outline" size={24} color="#3B82F6" />
+          </View>
+          <View>
+            <Text className="text-gray-900 text-lg font-medium">
+              Export to CSV
+            </Text>
+            <Text className="text-gray-400 text-sm">Download all expenses</Text>
+          </View>
+        </Pressable>
+      </View>
+
+      <View className="mt-8">
+        <CommonTitle text={"Manage Group"} />
+
+        <View className="gap-3">
+          <Pressable
+            onPress={handleDeleteGroup}
+            className="bg-white rounded-2xl px-5 py-4 flex-row items-center shadow-sm"
+          >
+            <View className="w-12 h-12 rounded-full bg-red-50 items-center justify-center mr-4">
+              <Ionicons name="trash-outline" size={24} color="#EF4444" />
+            </View>
+            <View>
+              <Text className="text-gray-900 text-lg font-medium">
+                Delete Group
+              </Text>
+              <Text className="text-gray-400 text-sm">
+                Permanently delete this group
+              </Text>
+            </View>
+          </Pressable>
+        </View>
+      </View>
     </ScrollView>
   );
 };
