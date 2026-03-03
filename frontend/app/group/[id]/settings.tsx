@@ -119,7 +119,7 @@ const Settings = () => {
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-50 mx-6"
+      className="flex-1 mx-6"
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 120 }}
     >
@@ -218,8 +218,8 @@ const Settings = () => {
           </View>
         </Pressable>
 
-        {group.createdBy === currentUserId && (
-          <View className="gap-3">
+        {Number(group.createdBy) === Number(currentUserId) && (
+          <View className="gap-3 mt-3">
             <Pressable
               onPress={handleDeleteGroup}
               className="bg-white rounded-2xl px-5 py-4 flex-row items-center shadow-sm"
