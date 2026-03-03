@@ -6,6 +6,7 @@ export interface Group {
   groupPicture: string;
   Status: string;
   createdBy: number;
+  inviteToken: string;
 }
 
 export interface GroupMember {
@@ -90,5 +91,16 @@ getGroupMembers: async (groupId: number): Promise<GroupMember[]> => {
       throw error;
     }
   },
+
+
+  joinGroup: async (inviteToken: string): Promise<Group> => {
+    try{
+    const response = await axiosInstance.post(`/splitra/groups/join/${inviteToken}`);
+    return response.data;
+  }catch (error) {
+    throw error
+  }
+  },
+  
 
 };

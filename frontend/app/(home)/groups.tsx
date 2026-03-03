@@ -6,16 +6,18 @@ import {
   Pressable,
   ScrollView,
   RefreshControl,
+  Modal,
+  TextInput,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-
-import CommonTitle from "../../component/commonTitle";
 import HomeButton from "../../component/homeButton";
 import { groupApi, Group } from "../api/groupApi";
 import { Ionicons } from "@expo/vector-icons";
 import GroupCard from "../../component/groupCard";
 import CreateGroupModal from "../../component/createGruop";
 import { router } from "expo-router";
+import JoinGroupModal from "../../component/joinGroup";
 
 const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -24,6 +26,7 @@ const Groups = () => {
   const [error, setError] = useState<string | null>(null);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("All");
+  const [showJoinGroupModal, setShowJoinGroupModal] = useState(false);
 
   useEffect(() => {
     fetchGroups();
@@ -37,7 +40,6 @@ const Groups = () => {
       setGroups(data);
     } catch (err: any) {
       setError(err.message || "Failed to fetch groups");
-      console.error("Error fetching groups:", err);
     } finally {
       setLoading(false);
     }
@@ -50,13 +52,11 @@ const Groups = () => {
   };
 
   const getFilteredGroups = () => {
-    if (selectedFilter === "All") {
-      return groups;
-    } else if (selectedFilter === "Settled") {
-      return groups.filter((group) => group.Status === "SETTLED");
-    } else if (selectedFilter === "Unsettled") {
-      return groups.filter((group) => group.Status === "UNSETTLED");
-    }
+    if (selectedFilter === "All") return groups;
+    if (selectedFilter === "Settled")
+      return groups.filter((g) => g.Status === "SETTLED");
+    if (selectedFilter === "Unsettled")
+      return groups.filter((g) => g.Status === "UNSETTLED");
     return groups;
   };
 
@@ -65,7 +65,7 @@ const Groups = () => {
   if (loading && !refreshing) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#3b82f6" />
+        <ActivityIndicator size="large" color="#101828" />
       </View>
     );
   }
@@ -76,36 +76,51 @@ const Groups = () => {
         <Text className="text-red-500 text-lg font-semibold mb-4">{error}</Text>
         <TouchableOpacity
           onPress={fetchGroups}
-          className="bg-blue-500 px-6 py-3 rounded-lg"
+          className="bg-primary px-6 py-3 rounded-lg"
         >
           <Text className="text-white font-semibold">Retry</Text>
         </TouchableOpacity>
       </View>
     );
   }
+
   return (
     <View className="flex-1 pl-6 pr-6">
-      <CommonTitle text="Your Groups" />
+      <View className="flex-row items-end justify-between pr-2 mt-56">
+        <View className="flex-row items-center gap-6">
+          <View className="w-2.5 h-12 bg-primary rounded-full" />
+          <Text className="text-3xl font-extrabold text-primary">
+            Your Groups
+          </Text>
+        </View>
+        <Pressable
+          onPress={() => setShowJoinGroupModal(true)}
+          className="flex-row items-center bg-primary px-4 py-2 rounded-2xl gap-2 mb-1"
+        >
+          <Ionicons name="person-add-outline" size={18} color="white" />
+          <Text className="text-white font-semibold text-base">Join Group</Text>
+        </Pressable>
+      </View>
 
+      {/* Filter Buttons */}
       <View className="flex-row w-full mt-3 gap-5">
         <HomeButton
           text="All"
           selected={selectedFilter === "All"}
           onPress={() => setSelectedFilter("All")}
         />
-
         <HomeButton
           text="Settled"
           selected={selectedFilter === "Settled"}
           onPress={() => setSelectedFilter("Settled")}
         />
-
         <HomeButton
           text="Unsettled"
           selected={selectedFilter === "Unsettled"}
           onPress={() => setSelectedFilter("Unsettled")}
         />
       </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -138,16 +153,24 @@ const Groups = () => {
           </View>
         )}
       </ScrollView>
+
       <Pressable
         className="absolute right-4 bottom-5"
         onPress={() => setShowCreateGroup(true)}
       >
-        <Ionicons name="add-circle" size={80} color="primary" />
+        <Ionicons name="add-circle" size={80} color="#101828" />
       </Pressable>
+
       <CreateGroupModal
         visible={showCreateGroup}
         onClose={() => setShowCreateGroup(false)}
         onGroupCreated={fetchGroups}
+      />
+
+      <JoinGroupModal
+        visible={showJoinGroupModal}
+        onClose={() => setShowJoinGroupModal(false)}
+        onJoined={fetchGroups}
       />
     </View>
   );

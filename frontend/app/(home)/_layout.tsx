@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 const Home = () => {
   return (
     <View className="flex-1">
-      <View className="absolute top-0 left-0 right-0 z-10">
+      <View className="absolute top-0 left-0 right-0 z-10" pointerEvents="none">
         <HomeHeaderBackground />
 
         <View className="absolute top-20 left-0 w-full h-28 bg-primary opacity-90 items-start justify-center ">

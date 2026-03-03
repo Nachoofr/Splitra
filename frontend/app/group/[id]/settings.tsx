@@ -6,6 +6,7 @@ import {
   Alert,
   Share,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -86,6 +87,28 @@ const Settings = () => {
     );
   };
 
+  const handleInvite = async () => {
+    try {
+      setInviteLoading(true);
+      const token = group.inviteToken;
+
+      if (!token) {
+        Alert.alert("Error", "Invite token not available.");
+        return;
+      }
+
+      await Share.share({
+        message:
+          `You've been invited to join "${group.groupName}" on Splitra!\n\n` +
+          `Your invite code:\n\n${token}`,
+      });
+    } catch (err: any) {
+      Alert.alert("Error", "Failed to share invite link.");
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
   const getInitials = (name: string) =>
     name
       .split(" ")
@@ -102,7 +125,7 @@ const Settings = () => {
     >
       <View className="mt-6">
         <Pressable
-          // onPress={handleInvite}
+          onPress={handleInvite}
           disabled={inviteLoading}
           className="bg-blue-500 rounded-3xl px-5 py-4 flex-row items-center justify-between"
         >
