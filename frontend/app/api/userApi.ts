@@ -2,7 +2,10 @@ import axiosInstance from './axiosConfig';
 
 export interface CurrentUser {
   fullName: string;
-  id: number
+  id: number;
+  email: string;
+  profilePicture: string;
+  phone: string;
 }
 
 export const userApi = {
