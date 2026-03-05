@@ -8,6 +8,13 @@ export interface CurrentUser {
   phone: string;
 }
 
+export interface UpdateUserRequest {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  profilePicture?: string;
+}
+
 export const userApi = {
   getCurrentUser: async (): Promise<CurrentUser> => {
     try{
@@ -18,4 +25,18 @@ export const userApi = {
         throw error;
     }
   },
+
+  updateUser: async (id: number, data: UpdateUserRequest): Promise<CurrentUser> => {
+  try {
+    const response = await axiosInstance.post<CurrentUser>(`/splitra/users/${id}`, {
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      profilePicture: data.profilePicture,
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+},
 };

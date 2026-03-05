@@ -123,5 +123,14 @@ getSplitDetails: async (expenseId: number): Promise<Record<string, number>> => {
   catch(error){
     throw error;
   }
-}
+},
+
+getNumberOfExpenses: async (): Promise<number> => {
+    try {
+      const response = await axiosInstance.get(`splitra/expenses/count`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 }

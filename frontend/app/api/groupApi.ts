@@ -9,6 +9,7 @@ export interface Group {
   inviteToken: string;
 }
 
+
 export interface GroupMember {
   id: number;
   name: string;
@@ -100,6 +101,15 @@ getGroupMembers: async (groupId: number): Promise<GroupMember[]> => {
   }catch (error) {
     throw error
   }
+  },
+
+  getNumberOfGroups: async (): Promise<number> => {
+    try {
+      const response = await axiosInstance.get(`splitra/groups/count`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
   
 
