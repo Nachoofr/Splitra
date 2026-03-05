@@ -101,8 +101,7 @@ const Groups = () => {
           <Text className="text-white font-semibold text-base">Join Group</Text>
         </Pressable>
       </View>
-
-      {/* Filter Buttons */}
+      
       <View className="flex-row w-full mt-3 gap-5">
         <HomeButton
           text="All"

@@ -40,7 +40,7 @@ const ProfileCard = ({
     <>
       <Pressable
         onPress={() => setShowProfile(true)}
-        className="bg-primary rounded-2xl p-5 mx-4 shadow-lg mt-56 active:opacity-80"
+        className="bg-primary rounded-3xl p-5 mx-4 shadow-lg mt-56 active:opacity-80"
       >
         <View className="flex-row items-center">
           <View className="w-14 h-14 rounded-full bg-[#2E4057] items-center justify-center mr-3">
