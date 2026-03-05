@@ -87,16 +87,7 @@ const More = () => {
   };
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor="#101828"
-        />
-      }
-    >
+    <View className="flex-1 bg-gray-100">
       {!loading && currentUserData && (
         <ProfileCard
           fullName={currentUserData.fullName}
@@ -105,71 +96,104 @@ const More = () => {
           groupCount={numberOfGroups}
           expenseCount={numberOfExpenses}
           userId={currentUserData.id}
-          onProfileUpdated={fetchData}
+          onProfileUpdated={() => fetchData()}
         />
       )}
 
-      <Text className="text-xs font-semibold tracking-widest text-gray-400 uppercase px-6 mt-6 mb-2">
-        Preferences
-      </Text>
-      <View className="bg-white rounded-3xl mx-6 overflow-hidden shadow-sm">
-        <SettingRow
-          icon="notifications-outline"
-          title="Notifications"
-          subtitle="Manage alerts & reminders"
-        />
-        <SettingRow
-          icon="lock-closed-outline"
-          title="Security"
-          subtitle="Biometric, 2FA, password"
-          isLast
-        />
-      </View>
-      <Text className="text-xs font-semibold tracking-widest text-gray-400 uppercase px-6 mt-8 mb-2">
-        Support
-      </Text>
-      <View className="bg-white rounded-3xl mx-6 overflow-hidden shadow-sm">
-        <SettingRow
-          icon="help-circle-outline"
-          title="Help & Support"
-          subtitle="FAQ, chat, email"
-        />
-        <SettingRow
-          icon="information-circle-outline"
-          title="About Splitra"
-          subtitle="Version, mission, contact"
-        />
-        <SettingRow
-          icon="shield-outline"
-          title="Privacy Policy"
-          subtitle="How we protect your data"
-        />
-        <SettingRow
-          icon="document-text-outline"
-          title="Terms of Service"
-          subtitle="Usage rules and policies"
-          isLast
-        />
-      </View>
-
-      <DangerButton
-        title="Sign Out"
-        icon="log-out-outline"
-        onPress={() =>
-          Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Sign Out",
-              style: "destructive",
-              onPress: async () => {
-                await AsyncStorage.removeItem("token");
-                router.replace("/(auth)/login");
-              },
-            },
-          ])
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#101828"
+          />
         }
-      />
-    </ScrollView>
+      >
+        <Text className="text-xs font-semibold tracking-widest text-gray-400 uppercase px-6 mt-6 mb-2">
+          Preferences
+        </Text>
+        <View className="bg-white rounded-3xl mx-6 overflow-hidden shadow-sm">
+          <SettingRow
+            icon="notifications-outline"
+            title="Notifications"
+            subtitle="Manage alerts & reminders"
+          />
+          <SettingRow
+            icon="lock-closed-outline"
+            title="Security"
+            subtitle="Biometric, 2FA, password"
+            isLast
+          />
+        </View>
+
+        <Text className="text-xs font-semibold tracking-widest text-gray-400 uppercase px-6 mt-6 mb-2">
+          Support
+        </Text>
+        <View className="bg-white rounded-3xl mx-6 overflow-hidden shadow-sm">
+          <SettingRow
+            icon="help-circle-outline"
+            title="Help & Support"
+            subtitle="FAQ, chat, email"
+          />
+          <SettingRow
+            icon="information-circle-outline"
+            title="About Splitra"
+            subtitle="Version, mission, contact"
+          />
+          <SettingRow
+            icon="shield-outline"
+            title="Privacy Policy"
+            subtitle="How we protect your data"
+          />
+          <SettingRow
+            icon="document-text-outline"
+            title="Terms of Service"
+            subtitle="Usage rules and policies"
+            isLast
+          />
+        </View>
+
+        <DangerButton
+          title="Sign Out"
+          icon="log-out-outline"
+          onPress={() =>
+            Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Sign Out",
+                style: "destructive",
+                onPress: async () => {
+                  await AsyncStorage.removeItem("token");
+                  router.replace("/(auth)/login");
+                },
+              },
+            ])
+          }
+        />
+
+        <DangerButton
+          title="Delete Account"
+          icon="trash-outline"
+          onPress={() =>
+            Alert.alert(
+              "Delete Account",
+              "Are you sure? This cannot be undone.",
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: () => Alert.alert("Coming soon!"),
+                },
+              ],
+            )
+          }
+        />
+      </ScrollView>
+    </View>
   );
 };
 
