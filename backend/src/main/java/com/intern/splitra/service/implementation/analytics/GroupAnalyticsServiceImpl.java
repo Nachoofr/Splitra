@@ -1,4 +1,4 @@
-package com.intern.splitra.service.analytics.implementation;
+package com.intern.splitra.service.implementation.analytics;
 
 import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.service.GroupAnalyticsService;
