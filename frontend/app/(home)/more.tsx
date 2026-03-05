@@ -12,6 +12,9 @@ import { userApi, CurrentUser } from "../api/userApi";
 import { Ionicons } from "@expo/vector-icons";
 import { groupApi } from "../api/groupApi";
 import { expenseApi } from "../api/expenseApi";
+import DangerButton from "../../component/dangerButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 
 const More = () => {
   const [currentUserData, setCurrentUserData] = useState<CurrentUser | null>(
@@ -148,6 +151,24 @@ const More = () => {
           isLast
         />
       </View>
+
+      <DangerButton
+        title="Sign Out"
+        icon="log-out-outline"
+        onPress={() =>
+          Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Sign Out",
+              style: "destructive",
+              onPress: async () => {
+                await AsyncStorage.removeItem("token");
+                router.replace("/(auth)/login");
+              },
+            },
+          ])
+        }
+      />
     </ScrollView>
   );
 };
