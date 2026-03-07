@@ -24,18 +24,30 @@ const GroupCard = ({ group, onPress }: groupApi) => {
     }
   };
 
-  const statusStyle = getStatusStyle(group.Status);
+  const getInitial = (name: string) => name?.charAt(0).toUpperCase() ?? "G";
+
   return (
     <Pressable
       onPress={() => onPress(group)}
       className="h-20 pl-4 pr-3 mt-3 bg-white rounded-2xl shadow-[0px_1px_2px_-1px_rgba(0,0,0,0.10)] border-l-4 border-primary flex-col justify-center items-center gap-3"
     >
       <View className="flex-row justify-center items-center">
-        <Image
-          source={{ uri: group.groupPicture }}
-          className="w-14 h-10 relative rounded-full shadow-[0px_0px_0px_2px_rgba(255,255,255,1.00)]"
-          src="https://placehold.co/40x40"
-        />
+        {group.groupPicture ? (
+          <Image
+            source={{ uri: group.groupPicture }}
+            style={{ width: 44, height: 44, borderRadius: 22 }}
+          />
+        ) : (
+          <View
+            style={{ width: 44, height: 44, borderRadius: 22 }}
+            className="bg-primary items-center justify-center"
+          >
+            <Text className="text-white text-lg font-bold">
+              {getInitial(group.groupName)}
+            </Text>
+          </View>
+        )}
+
         <Text className="text-lg font-medium flex-1 ml-3">
           {group.groupName}
         </Text>
@@ -50,9 +62,7 @@ const GroupCard = ({ group, onPress }: groupApi) => {
           </Text>
         </View>
         <Pressable className="ml-7">
-          <Pressable>
-            <Ionicons name="ellipsis-vertical" size={24} color="#9CA3AF" />
-          </Pressable>
+          <Ionicons name="ellipsis-vertical" size={24} color="#9CA3AF" />
         </Pressable>
       </View>
     </Pressable>

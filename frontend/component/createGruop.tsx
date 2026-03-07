@@ -6,12 +6,14 @@ import {
   TextInput,
   Alert,
   Platform,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { AxiosError } from "axios";
 import { groupApi } from "../app/api/groupApi";
 import { KeyboardAvoidingView } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 type CreateGroupProps = {
   visible: boolean;
@@ -30,6 +32,30 @@ const CreateGroup = ({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const handlePickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission required",
+        "Please allow access to your photo library.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      setGroupData({ ...groupData, groupPicture: base64Image });
+    }
+  };
 
   const handleCreateGroup = async () => {
     if (!groupData.groupName.trim()) {
@@ -56,7 +82,7 @@ const CreateGroup = ({
 
       Alert.alert(
         "Error",
-        err.response?.data?.message || "Failed to create group"
+        err.response?.data?.message || "Failed to create group",
       );
     } finally {
       setLoading(false);
@@ -82,13 +108,25 @@ const CreateGroup = ({
             </View>
 
             <View className="flex-row items-center mb-6">
-              <Pressable className="w-20 h-20 rounded-full border-2 border-dashed border-gray-300 items-center justify-center ">
-                <Ionicons name="camera" size={28} color="#98A2B3" />
+              <Pressable
+                onPress={handlePickImage}
+                className="w-20 h-20 rounded-full border-2 border-dashed border-gray-300 items-center justify-center overflow-hidden"
+              >
+                {groupData.groupPicture ? (
+                  <Image
+                    source={{ uri: groupData.groupPicture }}
+                    style={{ width: 80, height: 80, borderRadius: 40 }}
+                  />
+                ) : (
+                  <Ionicons name="camera" size={28} color="#98A2B3" />
+                )}
               </Pressable>
 
               <View className="ml-4 flex-1">
                 <Text className="font-medium text-gray-900">
-                  Upload a group picture
+                  {groupData.groupPicture
+                    ? "Tap to change picture"
+                    : "Upload a group picture"}
                 </Text>
                 <Text className="text-sm text-gray-400 mt-1">
                   JPG, PNG or GIF (Max 5MB)

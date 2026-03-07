@@ -13,6 +13,8 @@ const GroupHeader = ({
   groupPicture,
   memberCount,
 }: GroupHeaderProps) => {
+  const getInitial = (name: string) => name?.charAt(0).toUpperCase() ?? "G";
+
   return (
     <View className="bg-primary pt-14 pb-8 px-6">
       <Pressable onPress={() => router.back()} className="mb-6">
@@ -22,10 +24,23 @@ const GroupHeader = ({
       </Pressable>
 
       <View className="flex-row items-center">
-        <Image
-          source={{ uri: groupPicture }}
-          className="w-32 h-32 rounded-3xl border-[#374151] border-4"
-        />
+        {groupPicture ? (
+          <Image
+            source={{ uri: groupPicture }}
+            className="w-32 h-32 rounded-3xl border-[#374151] border-4"
+            style={{ width: 128, height: 128, borderRadius: 24 }}
+          />
+        ) : (
+          <View
+            style={{ width: 128, height: 128, borderRadius: 24 }}
+            className="bg-[#2E4057] border-[#374151] border-4 items-center justify-center"
+          >
+            <Text className="text-white text-5xl font-bold">
+              {getInitial(groupName)}
+            </Text>
+          </View>
+        )}
+
         <View className="ml-6 flex-1">
           <Text className="text-white text-4xl font-medium">{groupName}</Text>
           <View className="flex-row items-center mt-2">
