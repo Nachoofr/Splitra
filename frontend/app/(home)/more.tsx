@@ -47,6 +47,17 @@ const More = () => {
     }
   };
 
+  const deleteUser = async () => {
+    if (!currentUserData) return;
+    try {
+      await userApi.deleteUser(currentUserData.id);
+      await AsyncStorage.removeItem("token");
+      router.replace("/(auth)/login");
+    } catch (err) {
+      Alert.alert("Error", "Failed to delete account. Please try again.");
+    }
+  };
+
   interface SettingRowProps {
     icon: string;
     title: string;
@@ -96,7 +107,7 @@ const More = () => {
           groupCount={numberOfGroups}
           expenseCount={numberOfExpenses}
           userId={currentUserData.id}
-          onProfileUpdated={() => fetchData()}
+          onProfileUpdated={fetchData}
         />
       )}
 
@@ -186,8 +197,8 @@ const More = () => {
                 {
                   text: "Delete",
                   style: "destructive",
-                  onPress: () => Alert.alert("Coming soon!"),
-                },
+                  onPress: deleteUser
+                  },
               ],
             )
           }

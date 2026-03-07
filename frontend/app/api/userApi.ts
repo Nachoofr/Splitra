@@ -40,5 +40,15 @@ export const userApi = {
   }
 },
 
+  deleteUser: async (id: number): Promise<void> => {
+    try{
+        const response = await axiosInstance.delete<void>(`/splitra/users/${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+  },
+
 
 };
