@@ -24,6 +24,7 @@ public class Groups {
     @Column(unique = true, nullable = false)
     private String groupName;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String groupPicture;
 
     @Enumerated(EnumType.STRING)
@@ -37,7 +38,6 @@ public class Groups {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> customCategories = new HashSet<>();
 
-    // group members
     @ManyToMany
     @JoinTable(
             name = "group_members",
