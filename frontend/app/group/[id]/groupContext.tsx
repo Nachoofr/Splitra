@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 interface GroupContextType {
   group: any;
   memberCount: number;
+  refreshGroup: () => Promise<void>;
 }
 
 export const GroupContext = createContext<GroupContextType | undefined>(

@@ -15,7 +15,7 @@ export interface GroupMember {
   name: string;
 }
 
-export interface CreateGroupRequest {
+export interface GroupRequest {
   groupName: string;
   groupPicture: string;
 }
@@ -30,7 +30,7 @@ export const groupApi = {
     }
   },
 
-  createGroup: async (data: CreateGroupRequest
+  createGroup: async (data: GroupRequest
 ): Promise<Group> => {
   try {
     const response = await axiosInstance.post<Group>(
@@ -106,6 +106,18 @@ getGroupMembers: async (groupId: number): Promise<GroupMember[]> => {
   getNumberOfGroups: async (): Promise<number> => {
     try {
       const response = await axiosInstance.get(`splitra/groups/count`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  updateGroup: async (groupId: number, data: GroupRequest): Promise<Group> => {
+    try {
+      const response = await axiosInstance.post<Group>(`/splitra/groups/${groupId}`, {
+        groupName: data.groupName,
+        groupPicture: data.groupPicture,
+      });
       return response.data;
     } catch (error) {
       throw error;

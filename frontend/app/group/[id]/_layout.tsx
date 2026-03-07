@@ -15,7 +15,8 @@ const GroupLayout = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddExpense, setAddExpense] = useState(false);
-  const [memberCount, setMemberCount] = useState<number>(Number);
+  const [memberCount, setMemberCount] = useState<number>(0);
+
   useEffect(() => {
     if (id) {
       fetchGroupData(Number(id));
@@ -25,10 +26,8 @@ const GroupLayout = () => {
 
   const fetchGroupData = async (groupId: number) => {
     try {
-      console.log("Sending groupId:", groupId, typeof groupId);
       setLoading(true);
       setError(null);
-
       const data = await groupApi.getGroupById(groupId);
       setGroup(data);
     } catch (err: any) {
@@ -44,8 +43,14 @@ const GroupLayout = () => {
       const data = await groupApi.getGroupMemberCount(groupId);
       setMemberCount(data);
     } catch (err: any) {
-      setError("Failed to load group member count");
-      console.error(err);
+      console.error("Failed to load group member count", err);
+    }
+  };
+
+  const refreshGroup = async () => {
+    if (id) {
+      await fetchGroupData(Number(id));
+      await fetchGroupMemberCount(Number(id));
     }
   };
 
@@ -66,7 +71,7 @@ const GroupLayout = () => {
   }
 
   return (
-    <GroupContext.Provider value={{ group, memberCount }}>
+    <GroupContext.Provider value={{ group, memberCount, refreshGroup }}>
       <View className="flex-1 relative">
         <GroupHeader
           groupName={group.groupName}
@@ -154,24 +159,24 @@ const GroupLayout = () => {
           />
         </Tabs>
       </View>
+
       <Pressable className="absolute right-7 bottom-60 bg-primary rounded-full p-4">
         <Ionicons name="camera" size={35} color="white" />
       </Pressable>
+
       <Pressable
         className="absolute right-4 bottom-36"
         onPress={() => setAddExpense(true)}
       >
         <Ionicons name="add-circle" size={80} color="primary" />
       </Pressable>
+
       <AddExpenseModal
         visible={showAddExpense}
         onClose={() => setAddExpense(false)}
         groupId={String(id)}
         groupName={group.groupName}
         onExpenseAdded={() => {
-          {
-            fetchGroupData;
-          }
           console.log("Expense added");
         }}
       />
