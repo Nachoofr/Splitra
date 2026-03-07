@@ -11,8 +11,9 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { userApi } from "../app/api/userApi";
+import { userApi, QrCode } from "../app/api/userApi";
 import * as ImagePicker from "expo-image-picker";
+import PaymentQr from "./paymentQr";
 
 interface ProfileModalProps {
   visible: boolean;
@@ -21,6 +22,7 @@ interface ProfileModalProps {
   email: string;
   phone: string;
   profilePicture?: string;
+  qrCodes?: QrCode[];
   groupCount?: number;
   expenseCount?: number;
   userId: number;
@@ -34,6 +36,7 @@ const ProfileModal = ({
   email,
   phone,
   profilePicture,
+  qrCodes = [],
   groupCount = 0,
   expenseCount = 0,
   userId,
@@ -64,11 +67,10 @@ const ProfileModal = ({
     if (status !== "granted") {
       Alert.alert(
         "Permission required",
-        "Please allow access to your photo library to change your profile picture.",
+        "Please allow access to your photo library.",
       );
       return;
     }
-
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -76,12 +78,9 @@ const ProfileModal = ({
       quality: 0.7,
       base64: true,
     });
-
     if (!result.canceled && result.assets[0]) {
-      const asset = result.assets[0];
-      const base64Image = `data:image/jpeg;base64,${asset.base64}`;
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
       setLocalPicture(base64Image);
-
       try {
         setSaving(true);
         await userApi.updateUser(userId, {
@@ -92,7 +91,7 @@ const ProfileModal = ({
         });
         Alert.alert("Success", "Profile picture updated!");
         if (onProfileUpdated) onProfileUpdated();
-      } catch (err) {
+      } catch {
         Alert.alert(
           "Error",
           "Failed to update profile picture. Please try again.",
@@ -122,7 +121,6 @@ const ProfileModal = ({
       Alert.alert("Error", "Phone is required");
       return;
     }
-
     try {
       setSaving(true);
       await userApi.updateUser(userId, {
@@ -140,7 +138,7 @@ const ProfileModal = ({
           },
         },
       ]);
-    } catch (err) {
+    } catch {
       Alert.alert("Error", "Failed to update profile. Please try again.");
     } finally {
       setSaving(false);
@@ -174,7 +172,6 @@ const ProfileModal = ({
               {localPicture ? (
                 <Image
                   source={{ uri: localPicture }}
-                  className="w-28 h-28 rounded-full"
                   style={{ width: 112, height: 112, borderRadius: 56 }}
                 />
               ) : (
@@ -196,7 +193,6 @@ const ProfileModal = ({
                 )}
               </Pressable>
             </View>
-
             <Text className="text-primary text-2xl font-bold mt-4">
               {editData.fullName}
             </Text>
@@ -266,7 +262,7 @@ const ProfileModal = ({
             </View>
           </View>
 
-          <View className="mx-6 mt-6 mb-2 bg-[#1a2535] rounded-2xl px-6 py-5 flex-row justify-between items-center">
+          <View className="mx-6 mt-4 mb-2 bg-[#1a2535] rounded-2xl px-6 py-5 flex-row justify-between items-center">
             <View className="items-center flex-1">
               <Text className="text-white text-3xl font-bold">
                 {groupCount}
@@ -286,6 +282,13 @@ const ProfileModal = ({
               <Text className="text-gray-400 text-sm mt-1">Settled</Text>
             </View>
           </View>
+
+          <PaymentQr
+            userId={userId}
+            phone={phone}
+            qrCodes={qrCodes}
+            onUpdated={onProfileUpdated}
+          />
         </ScrollView>
 
         <View className="absolute bottom-0 left-0 right-0 px-6 pb-10 bg-gray-100">

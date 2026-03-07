@@ -1,11 +1,23 @@
 import axiosInstance from './axiosConfig';
 
+export interface QrCode {
+  id: number;
+  label: string;
+  qrImageData: string;
+}
+
+export interface QrCodeInput {
+  label: string;
+  qrImageData: string;
+}
+
 export interface CurrentUser {
   fullName: string;
   id: number;
   email: string;
   profilePicture: string;
   phone: string;
+  qrCodes: QrCode[];
 }
 
 export interface UpdateUserRequest {
@@ -13,6 +25,7 @@ export interface UpdateUserRequest {
   email?: string;
   phone?: string;
   profilePicture?: string;
+  qrCodes?: QrCodeInput[];
 }
 
 export const userApi = {
@@ -33,6 +46,7 @@ export const userApi = {
       email: data.email,
       phone: data.phone,
       profilePicture: data.profilePicture,
+      qrCodes: data.qrCodes,
     });
     return response.data;
   } catch (error) {

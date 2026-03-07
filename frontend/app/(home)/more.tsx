@@ -105,6 +105,7 @@ const More = () => {
           email={currentUserData.email}
           phone={currentUserData.phone}
           profilePicture={currentUserData.profilePicture}
+          qrCodes={currentUserData.qrCodes ?? []}
           groupCount={numberOfGroups}
           expenseCount={numberOfExpenses}
           userId={currentUserData.id}
@@ -195,11 +196,7 @@ const More = () => {
               "Are you sure? This cannot be undone.",
               [
                 { text: "Cancel", style: "cancel" },
-                {
-                  text: "Delete",
-                  style: "destructive",
-                  onPress: deleteUser,
-                },
+                { text: "Delete", style: "destructive", onPress: deleteUser },
               ],
             )
           }
