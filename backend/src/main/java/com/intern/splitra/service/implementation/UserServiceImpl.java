@@ -7,7 +7,6 @@ import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.SecurityService.JwtService;
 import com.intern.splitra.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -64,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public ResponseEntity<UserDto> deleteUser(Long id) {
-        Optional<User> optionalUser = userRepo.findById(id);
+        Optional<User> optionalUser = userRepo.findByIdAndActiveTrue(id);
         if (optionalUser.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -74,7 +73,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(userMapper.toDto(user), HttpStatus.OK);
     }
 
-        public ResponseEntity<String> verify(User user) {
+    public ResponseEntity<String> verify(User user) {
         try {
             Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
