@@ -3,9 +3,7 @@ package com.intern.splitra.mapper;
 import com.intern.splitra.dto.GroupDto;
 import com.intern.splitra.model.Groups;
 import com.intern.splitra.util.MapperUtil;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",  uses = {MapperUtil.class})
 public interface GroupMapper {
@@ -16,5 +14,6 @@ public interface GroupMapper {
     Groups toEntity(GroupDto groupDto);
     
     @Mapping(target = "createdBy.id", source = "createdBy")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Groups update(GroupDto groupDto, @MappingTarget Groups group);
 }

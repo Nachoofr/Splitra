@@ -145,4 +145,24 @@ public class GroupServiceImpl implements GroupService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    public ResponseEntity<GroupDto> updateGroup(long groupId, GroupDto groupDto, long userId) {
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().contains(user)) {
+            throw new RuntimeException("You are not a member of this group");
+        }
+
+        if (group.getCreatedBy().getId() != userId) {
+            throw new RuntimeException("Only the group creator can edit the group");
+        }
+
+        groupMapper.update(groupDto, group);
+        groupRepo.save(group);
+        return new ResponseEntity<>(groupMapper.toDto(group), HttpStatus.OK);
+    }
+
 }

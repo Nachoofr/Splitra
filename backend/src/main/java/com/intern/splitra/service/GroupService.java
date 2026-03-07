@@ -17,4 +17,5 @@ public interface GroupService {
     ResponseEntity<List<GroupMemberDto>> getGroupMembers(long groupId, long userId);
     ResponseEntity<Void> deleteGroup(long groupId, long userId);
     ResponseEntity<Void> leaveGroup(long groupId, long userId);
+    ResponseEntity<GroupDto> updateGroup(long groupId, GroupDto groupDto, long userId);
 }
