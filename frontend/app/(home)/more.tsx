@@ -104,6 +104,7 @@ const More = () => {
           fullName={currentUserData.fullName}
           email={currentUserData.email}
           phone={currentUserData.phone}
+          profilePicture={currentUserData.profilePicture}
           groupCount={numberOfGroups}
           expenseCount={numberOfExpenses}
           userId={currentUserData.id}
@@ -197,8 +198,8 @@ const More = () => {
                 {
                   text: "Delete",
                   style: "destructive",
-                  onPress: deleteUser
-                  },
+                  onPress: deleteUser,
+                },
               ],
             )
           }

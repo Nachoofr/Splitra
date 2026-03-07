@@ -7,10 +7,12 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { userApi } from "../app/api/userApi";
+import * as ImagePicker from "expo-image-picker";
 
 interface ProfileModalProps {
   visible: boolean;
@@ -18,6 +20,7 @@ interface ProfileModalProps {
   fullName: string;
   email: string;
   phone: string;
+  profilePicture?: string;
   groupCount?: number;
   expenseCount?: number;
   userId: number;
@@ -30,6 +33,7 @@ const ProfileModal = ({
   fullName,
   email,
   phone,
+  profilePicture,
   groupCount = 0,
   expenseCount = 0,
   userId,
@@ -38,10 +42,14 @@ const ProfileModal = ({
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ fullName, email, phone });
   const [saving, setSaving] = useState(false);
+  const [localPicture, setLocalPicture] = useState<string | undefined>(
+    profilePicture,
+  );
 
   useEffect(() => {
     setEditData({ fullName, email, phone });
-  }, [fullName, email, phone]);
+    setLocalPicture(profilePicture);
+  }, [fullName, email, phone, profilePicture]);
 
   const getInitials = (name: string) =>
     name
@@ -50,6 +58,51 @@ const ProfileModal = ({
       .join("")
       .toUpperCase()
       .slice(0, 2);
+
+  const handlePickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission required",
+        "Please allow access to your photo library to change your profile picture.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      const base64Image = `data:image/jpeg;base64,${asset.base64}`;
+      setLocalPicture(base64Image);
+
+      try {
+        setSaving(true);
+        await userApi.updateUser(userId, {
+          fullName: editData.fullName,
+          email: editData.email,
+          phone: editData.phone,
+          profilePicture: base64Image,
+        });
+        Alert.alert("Success", "Profile picture updated!");
+        if (onProfileUpdated) onProfileUpdated();
+      } catch (err) {
+        Alert.alert(
+          "Error",
+          "Failed to update profile picture. Please try again.",
+        );
+        setLocalPicture(profilePicture);
+      } finally {
+        setSaving(false);
+      }
+    }
+  };
 
   const handleCancel = () => {
     setEditData({ fullName, email, phone });
@@ -76,6 +129,7 @@ const ProfileModal = ({
         fullName: editData.fullName,
         email: editData.email,
         phone: editData.phone,
+        profilePicture: localPicture,
       });
       Alert.alert("Success", "Profile updated successfully!", [
         {
@@ -117,16 +171,29 @@ const ProfileModal = ({
         >
           <View className="items-center mt-10 mb-6">
             <View className="relative">
-              <View className="w-28 h-28 rounded-full bg-primary items-center justify-center">
-                <Text className="text-white text-4xl font-bold tracking-wide">
-                  {getInitials(editData.fullName)}
-                </Text>
-              </View>
+              {localPicture ? (
+                <Image
+                  source={{ uri: localPicture }}
+                  className="w-28 h-28 rounded-full"
+                  style={{ width: 112, height: 112, borderRadius: 56 }}
+                />
+              ) : (
+                <View className="w-28 h-28 rounded-full bg-primary items-center justify-center">
+                  <Text className="text-white text-4xl font-bold tracking-wide">
+                    {getInitials(editData.fullName)}
+                  </Text>
+                </View>
+              )}
               <Pressable
-                onPress={() => Alert.alert("Change photo", "Coming soon!")}
+                onPress={handlePickImage}
+                disabled={saving}
                 className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-white border border-gray-200 items-center justify-center shadow"
               >
-                <Ionicons name="camera-outline" size={18} color="#374151" />
+                {saving ? (
+                  <ActivityIndicator size="small" color="#374151" />
+                ) : (
+                  <Ionicons name="camera-outline" size={18} color="#374151" />
+                )}
               </Pressable>
             </View>
 
