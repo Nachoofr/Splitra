@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +21,8 @@ public class UserDto {
     private String phone;
     private String password;
     private String profilePicture;
+
+    private List<QrCodeDto> qrCodes;
 
     @JsonIgnore
     private String active;

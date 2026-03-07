@@ -10,7 +10,10 @@ public class QrCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String label;
+
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String qrImageData;
 
     @ManyToOne(fetch = FetchType.LAZY)

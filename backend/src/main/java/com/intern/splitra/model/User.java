@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -48,5 +50,8 @@ public class User {
 
     @ManyToMany(mappedBy = "members")
     private Set<Groups> groups = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QrCode> qrCodes = new ArrayList<>();
 
 }

@@ -10,5 +10,6 @@ public interface UserMapper {
     User toEntity(UserDto userDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "qrCodes", ignore = true)
     User update(UserDto userDto, @MappingTarget User user);
 }

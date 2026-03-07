@@ -1,7 +1,9 @@
 package com.intern.splitra.service.implementation;
 
+import com.intern.splitra.dto.QrCodeDto;
 import com.intern.splitra.dto.UserDto;
 import com.intern.splitra.mapper.UserMapper;
+import com.intern.splitra.model.QrCode;
 import com.intern.splitra.model.User;
 import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.SecurityService.JwtService;
@@ -58,6 +60,18 @@ public class UserServiceImpl implements UserService {
         User user = optionalUser.get();
         user.setActive(true);
         userMapper.update(userDto, user);
+
+        if (userDto.getQrCodes() != null) {
+            user.getQrCodes().clear();
+
+            for (QrCodeDto qrDto : userDto.getQrCodes()) {
+                QrCode qr = new QrCode();
+                qr.setLabel(qrDto.getLabel());
+                qr.setQrImageData(qrDto.getQrImageData());
+                qr.setUser(user);
+                user.getQrCodes().add(qr);
+            }
+        }
         userRepo.save(user);
         return new ResponseEntity<>(userMapper.toDto(user), HttpStatus.OK);
     }

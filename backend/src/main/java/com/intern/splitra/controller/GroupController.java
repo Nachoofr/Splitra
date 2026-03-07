@@ -72,8 +72,8 @@ public class GroupController {
     }
 
     @PostMapping(GroupApiEndpointConstants.GROUP_ID)
-    public ResponseEntity<GroupDto> updateGroup(@PathVariable long id, @RequestBody GroupDto groupDto, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+    public ResponseEntity<GroupDto> updateGroup(@PathVariable long groupId, @RequestBody GroupDto groupDto, @AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId = userPrinciple.getUser().getId();
-        return groupService.updateGroup(id, groupDto, userId);
+        return groupService.updateGroup(groupId, groupDto, userId);
     }
 }
