@@ -2,9 +2,11 @@ package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.BalanceDto;
 import com.intern.splitra.dto.SettlementDto;
+import com.intern.splitra.enums.SettlementStatus;
 import com.intern.splitra.model.*;
 import com.intern.splitra.repository.ExpenseRepo;
 import com.intern.splitra.repository.GroupRepo;
+import com.intern.splitra.repository.SettlementRepo;
 import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.BalanceService;
 import lombok.AllArgsConstructor;
@@ -20,6 +22,7 @@ public class BalanceServiceImpl implements BalanceService {
     private final UserRepo userRepo;
     ExpenseRepo expenseRepo;
     GroupRepo groupRepo;
+    SettlementRepo settlementRepo;
 
     public Map<Long, Double> calculateNet(Long groupId, Map<Long, String> names) {
         List<Expense> expenses = expenseRepo.findByGroupId(groupId);
@@ -27,29 +30,38 @@ public class BalanceServiceImpl implements BalanceService {
         Map<Long, Double> paid = new HashMap<>();
         Map<Long, Double> owed = new HashMap<>();
 
-        for (Expense expense : expenses){
-            for (ExpensePayment expensePayment : expense.getPaidBy()){
+        for (Expense expense : expenses) {
+            for (ExpensePayment expensePayment : expense.getPaidBy()) {
                 User payer = expensePayment.getPaidBy();
                 Double amount = expensePayment.getAmountPaid();
-
                 names.put(payer.getId(), payer.getFullName());
-                paid.put(payer.getId(),paid.getOrDefault(payer.getId(),0.0) + amount);
+                paid.put(payer.getId(), paid.getOrDefault(payer.getId(), 0.0) + amount);
             }
 
-            for (ExpenseSplit expenseSplit : expense.getSplits()){
+            for (ExpenseSplit expenseSplit : expense.getSplits()) {
                 User payee = expenseSplit.getUserId();
                 Double amount = expenseSplit.getAmount();
-
                 names.put(payee.getId(), payee.getFullName());
-                owed.put(payee.getId(), owed.getOrDefault(payee.getId(),0.0) + amount);
+                owed.put(payee.getId(), owed.getOrDefault(payee.getId(), 0.0) + amount);
             }
         }
 
         Map<Long, Double> netBalance = new HashMap<>();
-        for (Long user : names.keySet()){
+        for (Long user : names.keySet()) {
             double net = paid.getOrDefault(user, 0.0) - owed.getOrDefault(user, 0.0);
-            netBalance.put(user,net);
+            netBalance.put(user, net);
         }
+
+        List<Settlement> confirmed = settlementRepo
+                .findByGroupIdAndStatus(groupId, SettlementStatus.CONFIRMED);
+
+        for (Settlement s : confirmed) {
+            netBalance.put(s.getFromUser().getId(),
+                    netBalance.getOrDefault(s.getFromUser().getId(), 0.0) + s.getAmount());
+            netBalance.put(s.getToUser().getId(),
+                    netBalance.getOrDefault(s.getToUser().getId(), 0.0) - s.getAmount());
+        }
+
         return netBalance;
     }
 
