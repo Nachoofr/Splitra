@@ -1,18 +1,21 @@
 import { View, Text, Pressable, Alert } from "react-native";
 import React from "react";
-import { Settlement } from "../app/api/settelmentApi";
 import CommonTitle from "./commonTitleGroups";
 
+import { Settlement as SettlementType } from "../app/api/settelmentApi";
+
 interface SettlementListProps {
-  toReceiveList: Settlement[];
-  toPayList: Settlement[];
+  toReceiveList: SettlementType[];
+  toPayList: SettlementType[];
   groupName: string;
+  onSettlePress: (s: SettlementType) => void;
 }
 
 const SettlementList = ({
   toReceiveList,
   toPayList,
   groupName,
+  onSettlePress,
 }: SettlementListProps) => {
   return (
     <View>
@@ -88,19 +91,7 @@ const SettlementList = ({
               <View className="flex-row gap-3 mt-4">
                 <Pressable
                   className="flex-1 bg-primary rounded-2xl py-3 items-center"
-                  onPress={() =>
-                    Alert.alert(
-                      "Settle Up",
-                      `Mark payment to ${s.to} as done?`,
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Confirm",
-                          onPress: () => console.log("Settled"),
-                        },
-                      ],
-                    )
-                  }
+                  onPress={() => onSettlePress(s)}
                 >
                   <Text className="text-white font-medium">Settle Up</Text>
                 </Pressable>

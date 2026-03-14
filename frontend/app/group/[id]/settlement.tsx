@@ -8,21 +8,29 @@ import {
   Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { settlementApi, Settlement, Balance } from "../../api/settelmentApi";
+import {
+  settlementApi,
+  Settlement as SettlementType,
+  Balance,
+} from "../../api/settelmentApi";
 import { userApi } from "../../api/userApi";
 import { useGroup } from "./groupContext";
 import { Ionicons } from "@expo/vector-icons";
-import  SettlementSummary  from "../../../component/settlementSummary"
-import SettlementList from "../../../component/settlementList";
+import SettlementSummary from "../../../component/settlementSummary";
+import SettlementList from "../../../component/settlemetList";
+import PaymentMethodModal from "../../../component/paymentMethodModal";
 
-const Settlemet = () => {
+const Settlement = () => {
   const { group } = useGroup();
-  const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [settlements, setSettlements] = useState<SettlementType[]>([]);
   const [myBalance, setMyBalance] = useState<number>(0);
   const [currentUserName, setCurrentUserName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSettlement, setSelectedSettlement] =
+    useState<SettlementType | null>(null);
 
   useEffect(() => {
     if (group?.id) fetchAll();
@@ -58,6 +66,17 @@ const Settlemet = () => {
     setRefreshing(false);
   };
 
+  const handleSettlePress = (s: SettlementType) => {
+    setSelectedSettlement(s);
+    setModalVisible(true);
+  };
+
+  const handlePaymentConfirm = () => {
+    setModalVisible(false);
+    setSelectedSettlement(null);
+    fetchAll();
+  };
+
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
@@ -82,7 +101,6 @@ const Settlemet = () => {
 
   const toPayList = settlements.filter((s) => s.from === currentUserName);
   const toReceiveList = settlements.filter((s) => s.to === currentUserName);
-
   const isSettled = myBalance === 0;
 
   return (
@@ -100,6 +118,7 @@ const Settlemet = () => {
         toReceiveList={toReceiveList}
         toPayList={toPayList}
         groupName={group.groupName}
+        onSettlePress={handleSettlePress}
       />
 
       {isSettled && settlements.length === 0 && (
@@ -113,8 +132,19 @@ const Settlemet = () => {
           </Text>
         </View>
       )}
+
+      <PaymentMethodModal
+        visible={modalVisible}
+        onClose={() => {
+          setModalVisible(false);
+          setSelectedSettlement(null);
+        }}
+        onConfirm={handlePaymentConfirm}
+        toName={selectedSettlement?.to ?? ""}
+        amount={selectedSettlement?.amount ?? 0}
+      />
     </ScrollView>
   );
 };
 
-export default Settlemet;
+export default Settlement;
