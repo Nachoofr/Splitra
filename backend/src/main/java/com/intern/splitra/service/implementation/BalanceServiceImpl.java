@@ -117,7 +117,7 @@ public class BalanceServiceImpl implements BalanceService {
 
            long transfer = Math.min(creditAmount, debtAmount);
 
-           settlements.add(new SettlementDto(names.get(debt[0]), names.get(credit[0]), transfer));
+           settlements.add(new SettlementDto(debt[0], credit[0], names.get(debt[0]), names.get(credit[0]), transfer));
 
            long remainingCredit = creditAmount - transfer;
            long remainingDebt = debtAmount - transfer;

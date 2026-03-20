@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SettlementDto {
+    private Long fromUserId;
+    private Long toUserId;
     private String from;
     private String to;
     private Long amount;

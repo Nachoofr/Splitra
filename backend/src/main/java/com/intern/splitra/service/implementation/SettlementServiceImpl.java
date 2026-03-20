@@ -1,10 +1,10 @@
 package com.intern.splitra.service.implementation;
 
-import com.intern.splitra.dto.SettlementDto;
 import com.intern.splitra.dto.SettlementPaymentDto;
 import com.intern.splitra.enums.PaymentMethod;
 import com.intern.splitra.enums.SettlementStatus;
 import com.intern.splitra.mapper.SettlementMapper;
+import com.intern.splitra.mapper.SettlementMapperImpl;
 import com.intern.splitra.model.Groups;
 import com.intern.splitra.model.Settlement;
 import com.intern.splitra.model.User;
@@ -18,11 +18,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class SettlementServiceImpl implements SettlementService {
     private final SettlementMapper settlementMapper;
+    private final SettlementMapperImpl settlementMapperImpl;
     SettlementRepo settlementRepo;
     GroupRepo groupRepo;
     UserRepo userRepo;
@@ -84,6 +86,18 @@ public class SettlementServiceImpl implements SettlementService {
         settlement.setConfirmedAt(LocalDateTime.now());
         settlementRepo.save(settlement);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<SettlementPaymentDto>> getPendingSettlementsForUser(Long userId) {
+
+        List<Settlement> pending = settlementRepo
+                .findByToUserIdAndStatus(userId, SettlementStatus.PENDING);
+
+        List<SettlementPaymentDto> settlementPaymentDto = pending.stream()
+                .map(settlementMapper::toDto)
+                .toList();
+
+        return new ResponseEntity<>(settlementPaymentDto, HttpStatus.OK);
     }
 
 

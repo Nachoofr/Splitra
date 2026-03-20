@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface SettlementRepo extends JpaRepository<Settlement, Long> {
     List<Settlement> findByGroupIdAndStatus(Long groupId, SettlementStatus settlementStatus);
+    List<Settlement> findByToUserIdAndStatus(Long userId, SettlementStatus settlementStatus);
 }
