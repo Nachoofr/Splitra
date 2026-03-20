@@ -11,7 +11,7 @@ import React, { useState, useEffect } from "react";
 import {
   settlementApi,
   Settlement as SettlementType,
-  Balance,
+  PendingSettlement,
 } from "../../api/settelmentApi";
 import { userApi } from "../../api/userApi";
 import { useGroup } from "./groupContext";
@@ -19,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import SettlementSummary from "../../../component/settlementSummary";
 import SettlementList from "../../../component/settlemetList";
 import PaymentMethodModal from "../../../component/paymentMethodModal";
+import CommonTitle from "../../../component/commonTitleGroups";
 
 const Settlement = () => {
   const { group } = useGroup();
@@ -31,6 +32,10 @@ const Settlement = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSettlement, setSelectedSettlement] =
     useState<SettlementType | null>(null);
+  const [pendingSettlements, setPendingSettlements] = useState<
+    PendingSettlement[]
+  >([]);
+  const [confirmingId, setConfirmingId] = useState<number | null>(null);
 
   useEffect(() => {
     if (group?.id) fetchAll();
@@ -48,10 +53,13 @@ const Settlement = () => {
       setSettlements(settlementData);
 
       const balanceData = await settlementApi.getGroupBalance(Number(group.id));
-      const myBalance = balanceData.find(
+      const myBalanceData = balanceData.find(
         (b) => b.userName === currentUser.fullName,
       );
-      setMyBalance(myBalance?.balance ?? 0);
+      setMyBalance(myBalanceData?.balance ?? 0);
+
+      const pending = await settlementApi.getPendingSettlements();
+      setPendingSettlements(pending);
     } catch (err: any) {
       setError("Failed to load settlement data");
       console.error(err);
@@ -75,6 +83,34 @@ const Settlement = () => {
     setModalVisible(false);
     setSelectedSettlement(null);
     fetchAll();
+  };
+
+  const handleConfirmSettlement = async (settlementId: number) => {
+    Alert.alert(
+      "Confirm Payment",
+      "Confirm that you have received this cash payment?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Confirm",
+          onPress: async () => {
+            try {
+              setConfirmingId(settlementId);
+              await settlementApi.confirmSettlement(settlementId);
+              Alert.alert("Success", "Payment confirmed!");
+              fetchAll();
+            } catch (err: any) {
+              Alert.alert(
+                "Error",
+                err?.response?.data?.message || "Failed to confirm payment.",
+              );
+            } finally {
+              setConfirmingId(null);
+            }
+          },
+        },
+      ],
+    );
   };
 
   if (loading) {
@@ -103,6 +139,13 @@ const Settlement = () => {
   const toReceiveList = settlements.filter((s) => s.to === currentUserName);
   const isSettled = myBalance === 0;
 
+  const myPendingToConfirm = pendingSettlements.filter(
+    (p) =>
+      p.toUserName === currentUserName &&
+      p.status === "PENDING" &&
+      p.groupId === group.id,
+  );
+
   return (
     <ScrollView
       className="flex-1 bg-gray-50"
@@ -113,6 +156,53 @@ const Settlement = () => {
       contentContainerStyle={{ paddingBottom: 120 }}
     >
       <SettlementSummary myBalance={myBalance} />
+
+      {myPendingToConfirm.length > 0 && (
+        <View className="mx-6 mt-4">
+          <CommonTitle text={"Awaiting Your Confirmation"} />
+          {myPendingToConfirm.map((p) => (
+            <View
+              key={p.id}
+              className="bg-white rounded-3xl p-5 mb-3 border-l-4 border-yellow-400"
+            >
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center gap-3">
+                  <View className="w-12 h-12 rounded-full bg-yellow-100 items-center justify-center">
+                    <Text className="text-yellow-700 font-bold text-lg">
+                      {p.fromUserName.charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text className="text-xl font-semibold text-gray-900">
+                      {p.fromUserName}
+                    </Text>
+                    <Text className="text-gray-400 text-sm">
+                      Cash payment pending
+                    </Text>
+                  </View>
+                </View>
+                <Text className="text-gray-800 text-xl font-medium">
+                  NPR {p.amount}
+                </Text>
+              </View>
+
+              <Pressable
+                onPress={() => handleConfirmSettlement(p.id)}
+                disabled={confirmingId === p.id}
+                className="mt-4 bg-green-600 rounded-2xl py-3 items-center"
+              >
+                {confirmingId === p.id ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Text className="text-white font-semibold text-base">
+                    Confirm Paayment
+                  </Text>
+                )}
+              </Pressable>
+            </View>
+          ))}
+        </View>
+      )}
 
       <SettlementList
         toReceiveList={toReceiveList}
@@ -133,16 +223,20 @@ const Settlement = () => {
         </View>
       )}
 
-      <PaymentMethodModal
-        visible={modalVisible}
-        onClose={() => {
-          setModalVisible(false);
-          setSelectedSettlement(null);
-        }}
-        onConfirm={handlePaymentConfirm}
-        toName={selectedSettlement?.to ?? ""}
-        amount={selectedSettlement?.amount ?? 0}
-      />
+      {selectedSettlement && (
+        <PaymentMethodModal
+          visible={modalVisible}
+          onClose={() => {
+            setModalVisible(false);
+            setSelectedSettlement(null);
+          }}
+          onConfirm={handlePaymentConfirm}
+          toName={selectedSettlement.to}
+          toUserId={selectedSettlement.toUserId}
+          groupId={Number(group.id)}
+          amount={selectedSettlement.amount}
+        />
+      )}
     </ScrollView>
   );
 };
