@@ -12,6 +12,7 @@ import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.SettlementRepo;
 import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.SettlementService;
+import com.intern.splitra.util.SettlementUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,48 +27,14 @@ public class SettlementServiceImpl implements SettlementService {
     private final SettlementMapper settlementMapper;
     private final SettlementMapperImpl settlementMapperImpl;
     SettlementRepo settlementRepo;
-    GroupRepo groupRepo;
-    UserRepo userRepo;
+    private final SettlementUtil settlementUtil;
 
-    public ResponseEntity<SettlementPaymentDto> initiateCashSettlement (long groupId, long toUserId, long fromUserId, Double amount) {
-        Groups group = groupRepo.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Group not found"));
 
-        User fromUser = userRepo.findById(fromUserId)
-                .orElseThrow(() -> new RuntimeException("Payer not found"));
 
-        User toUser = userRepo.findById(toUserId)
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+    public ResponseEntity<SettlementPaymentDto> initiateCashSettlement(long groupId, long toUserId, long fromUserId, Double amount) {
+        Settlement settlement = settlementUtil.initiateSettlement(groupId, toUserId, fromUserId, amount, PaymentMethod.CASH);
 
-        if (!group.getMembers().contains(fromUser)) {
-            throw new RuntimeException("Payer is not a member of this group");
-        }
-
-        if (!group.getMembers().contains(toUser)) {
-            throw new RuntimeException("Receiver is not a member of this group");
-        }
-
-        if (fromUserId == toUserId) {
-            throw new RuntimeException("Payer and receiver cannot be the same person");
-        }
-
-        if (amount <= 0) {
-            throw new RuntimeException("Amount must be greater than zero");
-        }
-
-        Settlement settlement = new Settlement();
-        settlement.setGroup(group);
-        settlement.setFromUser(fromUser);
-        settlement.setToUser(toUser);
-        settlement.setAmount(amount);
-        settlement.setStatus(SettlementStatus.PENDING);
-        settlement.setPaymentMethod(PaymentMethod.CASH);
-        settlement.setTransactionId(null);
-        settlement.setCreatedAt(LocalDateTime.now());
-
-        SettlementPaymentDto settlementPaymentDto = settlementMapper.toDto(settlement);
-        settlementRepo.save(settlement);
-        return new ResponseEntity<>(settlementPaymentDto, HttpStatus.OK);
+        return new ResponseEntity<>(settlementMapper.toDto(settlement), HttpStatus.OK);
     }
 
     public ResponseEntity<Void> confirmSettlement(long settlementId, long userId) {
