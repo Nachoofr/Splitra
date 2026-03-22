@@ -1,7 +1,8 @@
-import { Modal, View, Text, Pressable, Image } from "react-native";
 import React, { useState } from "react";
+import { Modal, View, Text, Pressable, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import CashPaymentModal from "./cashPaymentModal";
+import EsewaPaymentModal from "./esewaPaymentModal";
 
 interface PaymentMethodModalProps {
   visible: boolean;
@@ -26,6 +27,7 @@ const PaymentMethodModal = ({
 }: PaymentMethodModalProps) => {
   const [selected, setSelected] = useState<PaymentMethod>(null);
   const [showCashModal, setShowCashModal] = useState(false);
+  const [showEsewaModal, setShowEsewaModal] = useState(false);
 
   const handleClose = () => {
     setSelected(null);
@@ -35,13 +37,15 @@ const PaymentMethodModal = ({
   const handleProceed = () => {
     if (selected === "cash") {
       setShowCashModal(true);
+    } else if (selected === "esewa") {
+      setShowEsewaModal(true);
     }
   };
 
   return (
     <>
       <Modal
-        visible={visible && !showCashModal}
+        visible={visible && !showCashModal && !showEsewaModal}
         transparent
         animationType="slide"
         onRequestClose={handleClose}
@@ -76,9 +80,7 @@ const PaymentMethodModal = ({
                 <Ionicons name="cash-outline" size={28} color="#16A34A" />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-900 text-lg font-semibold">
-                  Cash
-                </Text>
+                <Text className="text-gray-900 text-lg font-semibold">Cash</Text>
                 <Text className="text-gray-400 text-sm">
                   Pay with physical cash
                 </Text>
@@ -104,9 +106,7 @@ const PaymentMethodModal = ({
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-900 text-lg font-semibold">
-                  eSewa
-                </Text>
+                <Text className="text-gray-900 text-lg font-semibold">eSewa</Text>
                 <Text className="text-gray-400 text-sm">
                   Pay via eSewa wallet
                 </Text>
@@ -132,9 +132,7 @@ const PaymentMethodModal = ({
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-900 text-lg font-semibold">
-                  Khalti
-                </Text>
+                <Text className="text-gray-900 text-lg font-semibold">Khalti</Text>
                 <Text className="text-gray-400 text-sm">
                   Pay via Khalti wallet
                 </Text>
@@ -154,8 +152,8 @@ const PaymentMethodModal = ({
                   {selected === "cash"
                     ? "Cash"
                     : selected === "esewa"
-                      ? "eSewa"
-                      : "Khalti"}
+                    ? "eSewa"
+                    : "Khalti"}
                 </Text>
               </Pressable>
             )}
@@ -175,6 +173,20 @@ const PaymentMethodModal = ({
         toUserId={toUserId}
         groupId={groupId}
         suggestedAmount={amount}
+      />
+
+      <EsewaPaymentModal
+        visible={showEsewaModal}
+        onClose={() => setShowEsewaModal(false)}
+        onConfirm={() => {
+          setShowEsewaModal(false);
+          setSelected(null);
+          onConfirm();
+        }}
+        groupId={groupId}
+        toUserId={toUserId}
+        toName={toName}
+        amount={amount}
       />
     </>
   );

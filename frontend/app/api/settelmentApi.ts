@@ -25,6 +25,20 @@ export interface PendingSettlement {
     groupId: number,
 }
 
+export interface EsewaPaymentRequest {
+    amount: string,
+    taxAmount: string,
+    totalAmount: string,
+    transactionUuid: string,
+    productCode: string,
+    productServiceCharge: string,
+    productDeliveryCharge: string,
+    successUrl: string,
+    failureUrl: string,
+    signedFieldNames: string,
+    signature: string,
+}
+
 export const settlementApi= {
     getSettlement: async (groupId: number): Promise<Settlement[]> => {
         try{
@@ -79,5 +93,33 @@ export const settlementApi= {
         throw error;
     }
 },
+
+    initiateEsewaPayment: async ( groupId: number, toUserId: number, amount: number): Promise<EsewaPaymentRequest> => {
+        try {
+            const response = await axiosInstance.post<EsewaPaymentRequest>(
+                `/splitra/esewa/initiate`,
+                { groupId, toUserId, amount }
+            );
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    verifyEsewaPayment: async (
+        productCode: string,
+        transactionUuid: string,
+        totalAmount: string
+    ): Promise<void> => {
+        try {
+            await axiosInstance.post(`/splitra/esewa/verify`, {
+                productCode,
+                transactionUuid,
+                totalAmount,
+            });
+        } catch (error) {
+            throw error;
+        }
+    },
 };
 
