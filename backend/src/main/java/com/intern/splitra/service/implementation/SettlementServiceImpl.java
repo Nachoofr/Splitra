@@ -12,6 +12,7 @@ import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.SettlementRepo;
 import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.SettlementService;
+import com.intern.splitra.util.GroupUtil;
 import com.intern.splitra.util.SettlementUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ public class SettlementServiceImpl implements SettlementService {
     private final SettlementMapperImpl settlementMapperImpl;
     SettlementRepo settlementRepo;
     private final SettlementUtil settlementUtil;
+    private final GroupUtil groupUtil;
 
 
 
@@ -52,6 +54,8 @@ public class SettlementServiceImpl implements SettlementService {
         settlement.setStatus(SettlementStatus.CONFIRMED);
         settlement.setConfirmedAt(LocalDateTime.now());
         settlementRepo.save(settlement);
+
+        groupUtil.groupStatusUpdate(settlement.getGroup().getId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

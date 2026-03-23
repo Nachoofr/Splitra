@@ -8,6 +8,7 @@ import com.intern.splitra.enums.SettlementStatus;
 import com.intern.splitra.model.Settlement;
 import com.intern.splitra.repository.SettlementRepo;
 import com.intern.splitra.service.EsewaService;
+import com.intern.splitra.util.GroupUtil;
 import com.intern.splitra.util.SettlementUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ public class EsewaServiceImpl implements EsewaService {
     private final EsewaConfig esewaConfig;
     private final RestTemplate restTemplate;
     private final SettlementUtil settlementUtil;
+    private final GroupUtil groupUtil;
 
     public ResponseEntity<EsewaPaymentRequestDto> initiatePayment(long groupId, long toUserId, long fromUserId, Double amount) {
         Settlement settlement = settlementRepo.findByGroupIdAndFromUserIdAndToUserIdAndAmountAndPaymentMethod(
@@ -77,28 +79,35 @@ public class EsewaServiceImpl implements EsewaService {
                 "&transaction_uuid=" + verifyDto.getTransactionUuid() +
                 "&total_amount=" + verifyDto.getTotalAmount();
 
-        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+        try {
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
 
-        if (response.getBody() == null) {
-            throw new RuntimeException("eSewa verification failed");
+            if (response.getBody() == null) {
+                throw new RuntimeException("eSewa verification failed - empty response");
+            }
+
+            String status = (String) response.getBody().get("status");
+
+            if (!"COMPLETE".equals(status)) {
+                throw new RuntimeException("Payment not completed. Status: " + status);
+            }
+
+            Settlement settlement = settlementRepo
+                    .findByTransactionId(verifyDto.getTransactionUuid())
+                    .orElseThrow(() -> new RuntimeException("Settlement not found"));
+
+            settlement.setStatus(SettlementStatus.CONFIRMED);
+            settlement.setConfirmedAt(LocalDateTime.now());
+            settlementRepo.save(settlement);
+
+            groupUtil.groupStatusUpdate(settlement.getGroup().getId());
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            throw new RuntimeException("eSewa verification failed: " + e.getMessage());
         }
-
-        String status = (String) response.getBody().get("status");
-
-        if (!"COMPLETE".equals(status)) {
-            throw new RuntimeException("Payment not completed");
-        }
-
-        String transactionUuid = verifyDto.getTransactionUuid();
-        Settlement settlement = settlementRepo.findByTransactionId(transactionUuid)
-                .orElseThrow(() -> new RuntimeException("Settlement not found"));
-
-        settlement.setStatus(SettlementStatus.CONFIRMED);
-        settlement.setConfirmedAt(LocalDateTime.now());
-        settlementRepo.save(settlement);
-
-        return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
     public String generateSignature(String totalAmount, String transactionUuid, String productCode) {
         try {
