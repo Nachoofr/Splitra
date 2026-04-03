@@ -28,6 +28,12 @@ interface AddExpenseModalProps {
   onExpenseAdded?: () => void;
   editMode?: boolean;
   expenseToEdit?: Expense;
+  scannedData?: {
+    merchantName?: string;
+    totalAmount?: number;
+    suggestedCategory?: string;
+    date?: string | null;
+  } | null;
 }
 
 interface PayerAmount {
@@ -57,6 +63,7 @@ const AddExpense = ({
   onExpenseAdded,
   editMode = false,
   expenseToEdit,
+  scannedData,
 }: AddExpenseModalProps) => {
   const [expenseData, setExpenseData] = useState({
     description: "",
@@ -98,6 +105,29 @@ const AddExpense = ({
       setSplitMembers([...splitMembers, memberId]);
     }
   };
+
+  const loadScannedData = () => {
+    if (!scannedData) return;
+
+    const matchedCategory = categories.find(
+      (c) =>
+        c.name.toLowerCase() === scannedData.suggestedCategory?.toLowerCase(),
+    );
+
+    setExpenseData((prev) => ({
+      ...prev,
+      description: scannedData.merchantName || prev.description,
+      amount: scannedData.totalAmount?.toString() || prev.amount,
+      date: scannedData.date || prev.date,
+      category: matchedCategory?.id || prev.category,
+    }));
+  };
+
+  useEffect(() => {
+    if (visible && scannedData && categories.length > 0 && !editMode) {
+      loadScannedData();
+    }
+  }, [visible, scannedData, categories]);
 
   useEffect(() => {
     if (visible && groupId) {

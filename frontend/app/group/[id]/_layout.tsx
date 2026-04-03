@@ -7,6 +7,8 @@ import GroupHeader from "../../../component/groupHeader";
 import { groupApi } from "../../api/groupApi";
 import { GroupContext } from "./groupContext";
 import AddExpenseModal from "../../../component/addExpense";
+import BillScannerModal from "../../../component/billScannerModal";
+import { BillScanResult } from "../../api/billScanApi";
 
 const GroupLayout = () => {
   const { id } = useLocalSearchParams();
@@ -16,6 +18,8 @@ const GroupLayout = () => {
   const [error, setError] = useState<string | null>(null);
   const [showAddExpense, setAddExpense] = useState(false);
   const [memberCount, setMemberCount] = useState<number>(0);
+  const [showBillScanner, setShowBillScanner] = useState(false);
+  const [scannedExpense, setScannedExpense] = useState<any>(null);
 
   useEffect(() => {
     if (id) {
@@ -30,9 +34,8 @@ const GroupLayout = () => {
       setError(null);
       const data = await groupApi.getGroupById(groupId);
       setGroup(data);
-    } catch (err: any) {
+    } catch (err) {
       setError("Failed to load group");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -42,9 +45,7 @@ const GroupLayout = () => {
     try {
       const data = await groupApi.getGroupMemberCount(groupId);
       setMemberCount(data);
-    } catch (err: any) {
-      console.error("Failed to load group member count", err);
-    }
+    } catch {}
   };
 
   const refreshGroup = async () => {
@@ -52,6 +53,12 @@ const GroupLayout = () => {
       await fetchGroupData(Number(id));
       await fetchGroupMemberCount(Number(id));
     }
+  };
+
+  const handleScanComplete = (result: BillScanResult) => {
+    setScannedExpense(result);
+    setShowBillScanner(false);
+    setAddExpense(true);
   };
 
   if (loading) {
@@ -160,25 +167,39 @@ const GroupLayout = () => {
         </Tabs>
       </View>
 
-      <Pressable className="absolute right-7 bottom-60 bg-primary rounded-full p-4">
+      <Pressable
+        className="absolute right-7 bottom-60 bg-primary rounded-full p-4"
+        onPress={() => setShowBillScanner(true)}
+      >
         <Ionicons name="camera" size={35} color="white" />
       </Pressable>
 
       <Pressable
         className="absolute right-4 bottom-36"
-        onPress={() => setAddExpense(true)}
+        onPress={() => {
+          setScannedExpense(null);
+          setAddExpense(true);
+        }}
       >
         <Ionicons name="add-circle" size={80} color="primary" />
       </Pressable>
 
+      <BillScannerModal
+        visible={showBillScanner}
+        onClose={() => setShowBillScanner(false)}
+        onScanComplete={handleScanComplete}
+      />
+
       <AddExpenseModal
         visible={showAddExpense}
-        onClose={() => setAddExpense(false)}
+        onClose={() => {
+          setAddExpense(false);
+          setScannedExpense(null);
+        }}
         groupId={String(id)}
         groupName={group.groupName}
-        onExpenseAdded={() => {
-          console.log("Expense added");
-        }}
+        scannedData={scannedExpense}
+        onExpenseAdded={() => {}}
       />
     </GroupContext.Provider>
   );
