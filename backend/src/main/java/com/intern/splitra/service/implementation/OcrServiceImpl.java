@@ -69,7 +69,6 @@ public class OcrServiceImpl implements OcrService {
             String mimeType = request.getMimeType() != null ? request.getMimeType() : "image/jpeg";
             String base64Image = request.getImageBase64();
 
-            // Build image_url content part
             Map<String, Object> imageUrl = Map.of(
                     "url", "data:" + mimeType + ";base64," + base64Image
             );

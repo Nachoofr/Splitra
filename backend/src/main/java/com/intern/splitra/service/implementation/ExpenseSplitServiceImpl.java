@@ -2,6 +2,8 @@ package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.ExpenseSplitDto;
 import com.intern.splitra.dto.ExpenseSplitRequestDto;
+import com.intern.splitra.dto.ItemDto;
+import com.intern.splitra.dto.ItemSplitEntryDto;
 import com.intern.splitra.mapper.ExpenseSplitMapper;
 import com.intern.splitra.model.Expense;
 import com.intern.splitra.model.ExpenseSplit;
@@ -17,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -144,6 +143,80 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
 
         return new ResponseEntity<>(splitDto, HttpStatus.OK);
     }
+
+
+    public ResponseEntity<List<ExpenseSplitDto>> itemwiseSplit(long expenseId, List<ItemSplitEntryDto> entries, List<ItemDto> items, long loggedInUserId) {
+
+        if (entries == null || entries.isEmpty())
+            throw new RuntimeException("Item split entries cannot be empty");
+        if (items == null || items.isEmpty())
+            throw new RuntimeException("Items list cannot be empty");
+
+        Expense expense = expenseRepo.findById(expenseId)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+        Groups group = expense.getGroup();
+
+        if (group.getMembers().stream().noneMatch(m -> m.getId() == loggedInUserId))
+            throw new RuntimeException("User is not a member of the group");
+
+        for (ItemSplitEntryDto entry : entries)
+            if (group.getMembers().stream().noneMatch(m -> m.getId() == entry.getUserId()))
+                throw new RuntimeException("User " + entry.getUserId() + " is not a member of the group");
+
+        Map<Integer, Double> indexAmountMap = new HashMap<>();
+        for (ItemDto item : items)
+            indexAmountMap.put(item.getIndex(), item.getAmount());
+
+        Map<Integer, Long> indexUserCountMap = new HashMap<>();
+        for (ItemSplitEntryDto entry : entries)
+            for (Integer idx : entry.getItemIndexes())
+                indexUserCountMap.merge(idx, 1L, Long::sum);
+
+        Map<Long, Double> userAmounts = new LinkedHashMap<>();
+        long lastUserId = -1;
+
+        for (ItemSplitEntryDto entry : entries) {
+            double userTotal = 0.0;
+
+            for (Integer idx : entry.getItemIndexes()) {
+                Double itemAmount = indexAmountMap.get(idx);
+                if (itemAmount == null)
+                    throw new RuntimeException("Item index " + idx + " not found in items list");
+
+                long userCount = indexUserCountMap.get(idx);
+                userTotal += itemAmount / userCount;
+            }
+
+            userAmounts.merge(entry.getUserId(), userTotal, Double::sum);
+            lastUserId = entry.getUserId();
+        }
+
+        double calculatedTotal = userAmounts.values().stream()
+                .mapToDouble(Double::doubleValue).sum();
+        double remainder = expense.getAmount() - calculatedTotal;
+
+        if (Math.abs(remainder) > 0.0001 && lastUserId != -1)
+            userAmounts.merge(lastUserId, remainder, Double::sum);
+
+        List<ExpenseSplit> splitData = new ArrayList<>();
+        for (Map.Entry<Long, Double> entry : userAmounts.entrySet()) {
+            User user = userRepo.findById(entry.getKey())
+                    .orElseThrow(() -> new RuntimeException("User not found: " + entry.getKey()));
+            ExpenseSplit es = new ExpenseSplit();
+            es.setExpense(expense);
+            es.setUserId(user);
+            es.setAmount(entry.getValue());
+            splitData.add(es);
+        }
+
+        expenseSplitRepo.deleteAllByExpenseId(expenseId);
+        expenseSplitRepo.saveAll(splitData);
+
+        return new ResponseEntity<>(
+                splitData.stream().map(expenseSplitMapper::toDto).toList(),
+                HttpStatus.OK);
+    }
+
 
 
     public ResponseEntity<Map<String, Double>> getSplitDetails(long expenseId){
