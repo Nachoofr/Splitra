@@ -14,7 +14,17 @@ export interface ExpensePaymentRequest{
 }
 
 
-export interface AddExpenseRequest{
+export interface ItemSplitEntry {
+  userId: number;
+  itemIndexes: number[];
+}
+
+export interface ItemData {
+  index: number;
+  amount: number;
+}
+
+export interface AddExpenseRequest {
   description: string;
   amount: number;
   date: string;
@@ -22,8 +32,11 @@ export interface AddExpenseRequest{
   paidBy: ExpensePaymentRequest[];
   splitMethod: string;
   splitRequest?: {
-      equalSplitId?: number[];
-    } 
+    equalSplitId?: number[];
+    percentageSplitId?: Record<number, number>;
+    itemwiseSplit?: ItemSplitEntry[];
+    items?: ItemData[];
+  }
 }
 
 
