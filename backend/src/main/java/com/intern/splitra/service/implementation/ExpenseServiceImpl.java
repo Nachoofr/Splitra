@@ -2,6 +2,7 @@ package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.ExpenseDto;
 import com.intern.splitra.dto.ExpensePaymentDto;
+import com.intern.splitra.enums.ActivityType;
 import com.intern.splitra.mapper.ExpenseMapper;
 import com.intern.splitra.mapper.ExpensePaymentMapper;
 import com.intern.splitra.model.*;
@@ -9,6 +10,7 @@ import com.intern.splitra.repository.CategoryRepo;
 import com.intern.splitra.repository.ExpenseRepo;
 import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.UserRepo;
+import com.intern.splitra.service.ActivityService;
 import com.intern.splitra.service.ExpenseService;
 import com.intern.splitra.service.ExpenseSplitService;
 import enums.GroupStatus;
@@ -33,6 +35,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseMapper expenseMapper;
     private final GroupRepo groupRepo;
     private final ExpenseSplitService expenseSplitService;
+    private final ActivityService activityService;
 
 
     @Transactional
@@ -96,6 +99,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
         expense.setPaidBy(payments);
         expenseRepo.save(expense);
+        activityService.logActivity(ActivityType.EXPENSE_ADDED, group, user, expense.getDescription(), user.getFullName() + " added an expense", expense.getAmount());
 
         expenseSplitService.splitExpense(expense, expenseDto.getSplitRequest(), user);
         return new ResponseEntity<>(expenseMapper.toDto(expense), HttpStatus.CREATED);
@@ -221,6 +225,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         expenseRepo.save(expense);
+        activityService.logActivity(ActivityType.EXPENSE_UPDATED, group, user, expense.getDescription(), user.getFullName() + " updated an expense", expense.getAmount());
 
         return new ResponseEntity<>(expenseMapper.toDto(expense), HttpStatus.OK);
     }
@@ -249,6 +254,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         expenseRepo.delete(expense);
+        activityService.logActivity(ActivityType.EXPENSE_DELETED, group, user, expense.getDescription(), user.getFullName() + " deleted an expense", expense.getAmount());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

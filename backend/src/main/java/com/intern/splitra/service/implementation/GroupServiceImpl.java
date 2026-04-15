@@ -2,11 +2,13 @@ package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.GroupDto;
 import com.intern.splitra.dto.GroupMemberDto;
+import com.intern.splitra.enums.ActivityType;
 import com.intern.splitra.mapper.GroupMapper;
 import com.intern.splitra.model.Groups;
 import com.intern.splitra.model.User;
 import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.UserRepo;
+import com.intern.splitra.service.ActivityService;
 import com.intern.splitra.service.GroupService;
 import enums.GroupStatus;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ public class GroupServiceImpl implements GroupService {
     GroupMapper groupMapper;
     GroupRepo groupRepo;
     UserRepo userRepo;
+    private final ActivityService activityService;
 
     public ResponseEntity<GroupDto> createGroup(GroupDto groupDto, long userID) {
         User user = userRepo.findById(userID)
@@ -32,6 +35,7 @@ public class GroupServiceImpl implements GroupService {
         groups.setStatus(GroupStatus.CREATED);
         groups.getMembers().add(user);
         groupRepo.save(groups);
+        activityService.logActivity(ActivityType.GROUP_CREATED, groups, user, groups.getGroupName(), user.getFullName() + " created the group", null);
         return new ResponseEntity<>(groupMapper.toDto(groups), HttpStatus.CREATED);
     }
 
@@ -63,6 +67,8 @@ public class GroupServiceImpl implements GroupService {
 
         group.getMembers().add(user);
         groupRepo.save(group);
+        activityService.logActivity(ActivityType.MEMBER_JOINED, group, user, group.getGroupName(), user.getFullName() + " joined the group", null);
+
         return new ResponseEntity<>(groupMapper.toDto(group), HttpStatus.OK);
     }
 
@@ -142,6 +148,8 @@ public class GroupServiceImpl implements GroupService {
 
         group.getMembers().remove(user);
         groupRepo.save(group);
+        activityService.logActivity(ActivityType.MEMBER_LEFT, group, user, group.getGroupName(), user.getFullName() + " left the group", null);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -1,0 +1,13 @@
+package com.intern.splitra.enums;
+
+public enum ActivityType {
+    EXPENSE_ADDED,
+    EXPENSE_UPDATED,
+    EXPENSE_DELETED,
+    MEMBER_JOINED,
+    MEMBER_LEFT,
+    SETTLEMENT_INITIATED,
+    SETTLEMENT_CONFIRMED,
+    GROUP_CREATED,
+    GROUP_UPDATED
+}

@@ -1,6 +1,7 @@
 package com.intern.splitra.service.implementation;
 
 import com.intern.splitra.dto.SettlementPaymentDto;
+import com.intern.splitra.enums.ActivityType;
 import com.intern.splitra.enums.PaymentMethod;
 import com.intern.splitra.enums.SettlementStatus;
 import com.intern.splitra.mapper.SettlementMapper;
@@ -11,6 +12,7 @@ import com.intern.splitra.model.User;
 import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.SettlementRepo;
 import com.intern.splitra.repository.UserRepo;
+import com.intern.splitra.service.ActivityService;
 import com.intern.splitra.service.SettlementService;
 import com.intern.splitra.util.GroupUtil;
 import com.intern.splitra.util.SettlementUtil;
@@ -30,11 +32,13 @@ public class SettlementServiceImpl implements SettlementService {
     SettlementRepo settlementRepo;
     private final SettlementUtil settlementUtil;
     private final GroupUtil groupUtil;
+    private final ActivityService activityService;
 
 
 
     public ResponseEntity<SettlementPaymentDto> initiateCashSettlement(long groupId, long toUserId, long fromUserId, Double amount) {
         Settlement settlement = settlementUtil.initiateSettlement(groupId, toUserId, fromUserId, amount, PaymentMethod.CASH);
+        activityService.logActivity(ActivityType.SETTLEMENT_INITIATED, settlement.getGroup(), settlement.getFromUser(), "Settlement initiated", settlement.getFromUser().getFullName() + " initiated a cash payment to " + settlement.getToUser().getFullName(), settlement.getAmount());
 
         return new ResponseEntity<>(settlementMapper.toDto(settlement), HttpStatus.OK);
     }
@@ -54,6 +58,7 @@ public class SettlementServiceImpl implements SettlementService {
         settlement.setStatus(SettlementStatus.CONFIRMED);
         settlement.setConfirmedAt(LocalDateTime.now());
         settlementRepo.save(settlement);
+        activityService.logActivity(ActivityType.SETTLEMENT_CONFIRMED, settlement.getGroup(), settlement.getToUser(), "Settlement confirmed", settlement.getToUser().getFullName() + " confirmed receipt of payment from " + settlement.getFromUser().getFullName(), settlement.getAmount());
 
         groupUtil.groupStatusUpdate(settlement.getGroup().getId());
         return new ResponseEntity<>(HttpStatus.OK);

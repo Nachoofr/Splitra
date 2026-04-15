@@ -87,8 +87,8 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
         return switch (splitMethod) {
             case EQUALLY -> equalSplit(expense.getId(), expenseSplitRequestDto.getEqualSplitId(), user.getId());
             case PERCENTWISE ->  percentageSplit(expense.getId(), expenseSplitRequestDto.getPercentageSplitId(), user.getId());
+            case ITEMWISE -> itemwiseSplit(expense.getId(), expenseSplitRequestDto.getItemwiseSplit(), expenseSplitRequestDto.getItems(), user.getId());
             default -> throw new RuntimeException("Invalid splitMethod");
-//            case ITEMWISE ->
         };
     }
 

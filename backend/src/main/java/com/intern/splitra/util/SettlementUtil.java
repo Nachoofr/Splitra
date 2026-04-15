@@ -1,5 +1,6 @@
 package com.intern.splitra.util;
 
+import com.intern.splitra.enums.ActivityType;
 import com.intern.splitra.enums.PaymentMethod;
 import com.intern.splitra.enums.SettlementStatus;
 import com.intern.splitra.model.Groups;
@@ -8,6 +9,7 @@ import com.intern.splitra.model.User;
 import com.intern.splitra.repository.GroupRepo;
 import com.intern.splitra.repository.SettlementRepo;
 import com.intern.splitra.repository.UserRepo;
+import com.intern.splitra.service.ActivityService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,7 @@ public class SettlementUtil {
     private final GroupRepo groupRepo;
     private final UserRepo userRepo;
     private final SettlementRepo settlementRepo;
+    private final ActivityService activityService;
 
     public Settlement initiateSettlement(
             long groupId, long toUserId, long fromUserId,
@@ -61,5 +64,6 @@ public class SettlementUtil {
         settlement.setCreatedAt(LocalDateTime.now());
 
         return settlementRepo.save(settlement);
+
     }
 }
