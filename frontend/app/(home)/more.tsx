@@ -15,6 +15,7 @@ import { expenseApi } from "../api/expenseApi";
 import DangerButton from "../../component/dangerButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import ResetPasswordModal from "../../component/resetPasswordModal";
 
 const More = () => {
   const [currentUserData, setCurrentUserData] = useState<CurrentUser | null>(
@@ -24,6 +25,7 @@ const More = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [numberOfGroups, setNumberOfGroups] = useState(0);
   const [numberOfExpenses, setNumberOfExpenses] = useState(0);
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -64,6 +66,7 @@ const More = () => {
     subtitle: string;
     onPress?: () => void;
     isLast?: boolean;
+    accentColor?: string;
   }
 
   const SettingRow = ({
@@ -72,14 +75,24 @@ const More = () => {
     subtitle,
     onPress,
     isLast = false,
+    accentColor,
   }: SettingRowProps) => (
     <>
       <Pressable
         onPress={onPress || (() => Alert.alert(title, ""))}
         className="flex-row items-center px-4 py-4 active:bg-gray-50"
       >
-        <View className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center mr-4">
-          <Ionicons name={icon as any} size={20} color="#374151" />
+        <View
+          className="w-10 h-10 rounded-full items-center justify-center mr-4"
+          style={{
+            backgroundColor: accentColor ? `${accentColor}18` : "#F3F4F6",
+          }}
+        >
+          <Ionicons
+            name={icon as any}
+            size={20}
+            color={accentColor || "#374151"}
+          />
         </View>
         <View className="flex-1">
           <Text className="text-gray-900 text-base font-medium">{title}</Text>
@@ -138,6 +151,20 @@ const More = () => {
             icon="lock-closed-outline"
             title="Security"
             subtitle="Biometric, 2FA, password"
+            isLast
+          />
+        </View>
+
+        <Text className="text-xs font-semibold tracking-widest text-gray-400 uppercase px-6 mt-6 mb-2">
+          Security
+        </Text>
+        <View className="bg-white rounded-3xl mx-6 overflow-hidden shadow-sm">
+          <SettingRow
+            icon="key-outline"
+            title="Reset Password"
+            subtitle="Change your account password"
+            onPress={() => setShowResetPassword(true)}
+            accentColor="#3B82F6"
             isLast
           />
         </View>
@@ -202,6 +229,11 @@ const More = () => {
           }
         />
       </ScrollView>
+
+      <ResetPasswordModal
+        visible={showResetPassword}
+        onClose={() => setShowResetPassword(false)}
+      />
     </View>
   );
 };

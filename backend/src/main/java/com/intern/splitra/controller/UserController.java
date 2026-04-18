@@ -3,6 +3,7 @@ package com.intern.splitra.controller;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
 import com.intern.splitra.constant.UserApiEndpointConstants;
+import com.intern.splitra.dto.ResetPasswordDto;
 import com.intern.splitra.dto.UserDto;
 import com.intern.splitra.model.SecurityModel.UserPrinciple;
 import com.intern.splitra.model.User;
@@ -29,30 +30,7 @@ public class UserController {
 
     @PostMapping(UserApiEndpointConstants.LOGIN)
     public ResponseEntity<String>login(@RequestBody User user){
-
-
-//        // test Gemini API call
-//        // The client gets the API key from the environment variable `GEMINI_API_KEY`.
-//        try{
-//            Client client = Client.builder()
-//                    .apiKey("AIzaSyDiRbEwWs7Xyp2yTDYY4aSF1yfRz0wv-hc")
-//                    .build();
-//
-//            GenerateContentResponse response =
-//                    client.models.generateContent(
-//                            "gemini-3-flash-preview",
-//                            "Explain how AI works in a few words",
-//                            null);
-//
-//            System.out.println(response.text());
-//        }
-//        catch(Exception e){
-//            System.out.println("Error calling Gemini API: " + e.getMessage());
-//        }
-
-
         System.out.println("Login request received for user: " + user.getEmail());
-
         return userService.verify(user);
     }
 
@@ -83,4 +61,9 @@ public class UserController {
         return userService.deleteUser(id);
     }
 
+    @PostMapping("/splitra/users/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        long userId = userPrinciple.getUser().getId();
+        return userService.resetPassword(userId, resetPasswordDto.getCurrentPassword(), resetPasswordDto.getNewPassword());
+    }
 }

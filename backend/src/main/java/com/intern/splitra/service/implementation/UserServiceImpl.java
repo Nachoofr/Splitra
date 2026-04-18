@@ -104,5 +104,21 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    public ResponseEntity<Void> resetPassword(Long userId, String currentPassword, String newPassword) {
+        Optional<User> optionalUser = userRepo.findById(userId);
+        if (optionalUser.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        User user = optionalUser.get();
+
+        if (!encoder.matches(currentPassword, user.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        user.setPassword(encoder.encode(newPassword));
+        userRepo.save(user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
 }

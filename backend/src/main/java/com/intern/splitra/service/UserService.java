@@ -14,4 +14,5 @@ public interface UserService {
     ResponseEntity<UserDto> updateUser(UserDto userDto, Long id);
     ResponseEntity<UserDto> deleteUser(Long id);
     ResponseEntity<String> verify(User user);
+    ResponseEntity<Void> resetPassword(Long userId, String currentPassword, String newPassword);
 }
