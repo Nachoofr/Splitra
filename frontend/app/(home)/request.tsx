@@ -69,8 +69,7 @@ const Request = () => {
                 allToReceive.push(enriched);
               }
             });
-          } catch {
-          }
+          } catch {}
         }),
       );
 
@@ -146,6 +145,9 @@ const Request = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
+      <View className="pl-6">
+        <CommonTitle text="Requests" />
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -157,10 +159,6 @@ const Request = () => {
         }
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <View className="pl-6">
-          <CommonTitle text="Requests" />
-        </View>
-
         {error ? (
           <View className="flex-1 justify-center items-center px-6 mt-10">
             <Text className="text-red-500 text-base mb-4">{error}</Text>
