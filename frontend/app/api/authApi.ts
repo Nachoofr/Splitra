@@ -12,5 +12,15 @@ export const authApi = {
     return response.data;
   },
 
+  sendVerificationCode: async (email: string, purpose: 'SIGNUP' | 'FORGOT_PASSWORD'): Promise<void> => {
+    await AxiosInstance.post('/splitra/users/send-verification', { email, purpose });
+  },
 
+  verifyCode: async (email: string, code: string, purpose: 'SIGNUP' | 'FORGOT_PASSWORD'): Promise<void> => {
+    await AxiosInstance.post('/splitra/users/verify-code', { email, code, purpose });
+  },
+
+  forgotPasswordReset: async (email: string, code: string, newPassword: string): Promise<void> => {
+    await AxiosInstance.post('/splitra/users/forgot-password-reset', { email, code, new_password: newPassword });
+  },
 };

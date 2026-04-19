@@ -28,7 +28,6 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    // Validation
     if (
       !formData.fullName ||
       !formData.email ||
@@ -49,30 +48,49 @@ const SignUp = () => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      Alert.alert("Error", "Phone number must be exactly 10 digits");
+      return;
+    }
+
     try {
       setLoading(true);
-      console.log("Attempting signup with:", { ...formData, password: "***" });
 
-      const response = await authApi.signUp({
+      await authApi.sendVerificationCode(formData.email, "SIGNUP");
+
+      const signupPayload = JSON.stringify({
         fullName: formData.fullName,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
       });
 
-      console.log("Signup successful:", response);
-
-      Alert.alert("Success", "Account created successfully!", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/(auth)/login"),
+      router.push({
+        pathname: "/(auth)/verifyEmail",
+        params: {
+          email: formData.email,
+          purpose: "SIGNUP",
+          signupData: signupPayload,
         },
-      ]);
+      });
     } catch (error: any) {
-      console.error("Signup error:", error);
-      const errorMessage =
-        error.response?.data?.message || "Sign up failed. Please try again.";
-      Alert.alert("Error", errorMessage);
+      console.error("Send verification error:", error);
+      const status = error?.response?.status;
+      if (status >= 400 && status < 500) {
+        Alert.alert(
+          "Error",
+          "Could not send verification email. Please check your email address.",
+        );
+      } else {
+        Alert.alert("Error", "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -168,7 +186,7 @@ const SignUp = () => {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text className="text-white text-center p-4">Sign Up</Text>
+                <Text className="text-white text-center p-4">Continue</Text>
               )}
             </AuthButton>
           </View>

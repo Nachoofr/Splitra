@@ -49,14 +49,11 @@ const Login = () => {
 
     try {
       setLoading(true);
-      console.log("Attempting login with:", { ...formData, password: "***" });
 
       const response = await authApi.signIn({
         email: formData.email,
         password: formData.password,
       });
-
-      console.log("Login successful:", response);
 
       await AsyncStorage.setItem("token", response);
 
@@ -165,7 +162,7 @@ const Login = () => {
               Forgot your password?
             </Text>
 
-            <AuthSecondaryButton href="/reset-password" className="w-40">
+            <AuthSecondaryButton href="/forgotPassword" className="w-48">
               <Text className="text-primary text-xl font-normal mt-2 text-center p-5">
                 Reset Password
               </Text>
