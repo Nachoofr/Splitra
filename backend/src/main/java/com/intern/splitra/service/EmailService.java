@@ -1,4 +1,5 @@
 package com.intern.splitra.service;
 
-public class EmailService {
+public interface EmailService {
+    void sendVerificationCode(String email, String code, String purpose);
 }

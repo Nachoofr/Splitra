@@ -22,7 +22,6 @@ public class SettlementUtil {
     private final GroupRepo groupRepo;
     private final UserRepo userRepo;
     private final SettlementRepo settlementRepo;
-    private final ActivityService activityService;
 
     public Settlement initiateSettlement(
             long groupId, long toUserId, long fromUserId,

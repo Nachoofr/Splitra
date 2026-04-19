@@ -5,7 +5,9 @@ import com.intern.splitra.dto.UserDto;
 import com.intern.splitra.mapper.UserMapper;
 import com.intern.splitra.model.QrCode;
 import com.intern.splitra.model.User;
+import com.intern.splitra.model.VerificationCode;
 import com.intern.splitra.repository.UserRepo;
+import com.intern.splitra.repository.VerificationCodeRepo;
 import com.intern.splitra.service.SecurityService.JwtService;
 import com.intern.splitra.service.UserService;
 import lombok.AllArgsConstructor;
@@ -17,17 +19,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-    private JwtService jwtService;
-    AuthenticationManager authManager;
-    UserMapper userMapper;
-    UserRepo userRepo;
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        private JwtService jwtService;
+        private AuthenticationManager authManager;
+        private UserMapper userMapper;
+        private UserRepo userRepo;
+        private VerificationCodeRepo verificationCodeRepo;
+        private BCryptPasswordEncoder encoder;
 
     public ResponseEntity<UserDto> createUser(UserDto userDto) {
         var user = userMapper.toEntity(userDto);
@@ -90,7 +94,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> verify(User user) {
         try {
             Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+                    new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
             );
 
             if (authentication.isAuthenticated()) {
@@ -120,5 +124,41 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Void> resetPasswordWithCode(String email, String code, String newPassword) {
+        Optional<VerificationCode> optCode = verificationCodeRepo
+                .findTopByEmailAndPurposeAndUsedFalseOrderByExpiresAtDesc(email, "FORGOT_PASSWORD");
 
+        if (optCode.isEmpty()) {
+            System.out.println("DEBUG: no unused code found for email=" + email);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        VerificationCode vc = optCode.get();
+
+        if (vc.getExpiresAt().isBefore(LocalDateTime.now())) {
+            System.out.println("DEBUG: code expired for email=" + email);
+            return new ResponseEntity<>(HttpStatus.GONE);
+        }
+
+        if (!vc.getCode().equals(code)) {
+            System.out.println("DEBUG: code mismatch. expected=" + vc.getCode() + " got=" + code);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User user = userRepo.findByEmail(email);
+        if (user == null) {
+            System.out.println("DEBUG: user not found for email=" + email);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        System.out.println("DEBUG: all checks passed, resetting password");
+        user.setPassword(encoder.encode(newPassword));
+        userRepo.save(user);
+
+        vc.setUsed(true);
+        verificationCodeRepo.save(vc);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

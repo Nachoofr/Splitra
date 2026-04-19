@@ -1,13 +1,11 @@
 package com.intern.splitra.config;
 
-import com.intern.splitra.constant.UserApiEndpointConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,7 +31,14 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/splitra/users/login", "/splitra/users/signup", "/error").permitAll()
+                        .requestMatchers(
+                                "/splitra/users/login",
+                                "/splitra/users/signup",
+                                "/splitra/users/send-verification",
+                                "/splitra/users/verify-code",
+                                "/splitra/users/forgot-password-reset",
+                                "/error"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
