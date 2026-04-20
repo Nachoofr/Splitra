@@ -69,6 +69,10 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (group.getMembers().contains(user)) {
+            throw new RuntimeException("You are already a member of this group");
+        }
+
+        if (group.getMembers().contains(user)) {
             return new ResponseEntity<>(groupMapper.toDto(group), HttpStatus.OK);
         }
 

@@ -61,15 +61,15 @@ public class GroupController {
     }
 
     @DeleteMapping(GroupApiEndpointConstants.GROUP_ID + "/delete")
-    public ResponseEntity<Void> deleteGroup(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+    public ResponseEntity<Void> deleteGroup(@PathVariable long groupId, @AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId = userPrinciple.getUser().getId();
-        return groupService.deleteGroup(id, userId);
+        return groupService.deleteGroup(groupId, userId);
     }
 
     @DeleteMapping(GroupApiEndpointConstants.GROUP_ID + "/leave")
-    public ResponseEntity<Void> leaveGroup(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+    public ResponseEntity<Void> leaveGroup(@PathVariable long groupId, @AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId = userPrinciple.getUser().getId();
-        return groupService.leaveGroup(id, userId);
+        return groupService.leaveGroup(groupId, userId);
     }
 
     @PostMapping(GroupApiEndpointConstants.GROUP_ID)
