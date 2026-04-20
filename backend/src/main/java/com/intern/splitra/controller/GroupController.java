@@ -32,8 +32,9 @@ public class GroupController {
     }
 
     @GetMapping(GroupApiEndpointConstants.GROUP_ID)
-    public ResponseEntity<GroupDto> getGroupById(@PathVariable long id) {
-        return groupService.getGroupById(id);
+    public ResponseEntity<GroupDto> getGroupById(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+        long userId = userPrinciple.getUser().getId();
+        return groupService.getGroupById(id, userId);
     }
 
     @PostMapping (GroupApiEndpointConstants.JOIN_GROUP)

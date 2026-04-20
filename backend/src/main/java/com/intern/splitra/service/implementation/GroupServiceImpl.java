@@ -46,12 +46,19 @@ public class GroupServiceImpl implements GroupService {
         return new ResponseEntity<List<GroupDto>>(groups, HttpStatus.OK);
     }
 
-    public ResponseEntity<GroupDto> getGroupById(long groupId) {
-        var group = groupRepo.findById(groupId);
-        if (group.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<GroupDto> getGroupById(long groupId, long userId) {
+
+        Groups group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().contains(user)) {
+            throw new RuntimeException("You are not a member of this group");
         }
-        return new ResponseEntity<>(groupMapper.toDto(group.get()), HttpStatus.OK);
+        var groups = groupMapper.toDto(group);
+        return new ResponseEntity<>(groups, HttpStatus.OK);
     }
 
     public ResponseEntity<GroupDto> joinGroup(String inviteToken, long userId) {

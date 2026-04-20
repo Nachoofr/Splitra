@@ -10,7 +10,7 @@ import java.util.List;
 public interface GroupService {
     ResponseEntity<GroupDto> createGroup(GroupDto groupDto, long groupID);
     ResponseEntity<List<GroupDto>> getAllGroups(long userId);
-    ResponseEntity<GroupDto> getGroupById(long groupId);
+    ResponseEntity<GroupDto> getGroupById(long groupId, long userId);
     ResponseEntity<GroupDto> joinGroup(String inviteToken, long userId);
     ResponseEntity<String> getInviteLink(long groupId, long userId);
     ResponseEntity<Long> getNumberOfMembers(long groupId);

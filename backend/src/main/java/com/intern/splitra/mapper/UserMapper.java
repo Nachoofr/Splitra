@@ -8,7 +8,6 @@ import org.mapstruct.*;
 public interface UserMapper {
     UserDto toDto(User user);
 
-    @Mapping(target = "password", ignore = true)
     User toEntity(UserDto userDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
