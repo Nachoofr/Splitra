@@ -15,7 +15,7 @@ const SettlementList = ({
   toReceiveList,
   toPayList,
   groupName,
-  onSettlePress,
+  onSettlePress
 }: SettlementListProps) => {
   return (
     <View>
@@ -43,7 +43,7 @@ const SettlementList = ({
                   </View>
                 </View>
                 <Text className="text-green-600 text-xl font-medium">
-                  NPR {s.amount}
+                  NPR {Number(s.amount).toFixed(2)}
                 </Text>
               </View>
 
@@ -84,7 +84,7 @@ const SettlementList = ({
                   </View>
                 </View>
                 <Text className="text-red-500 text-xl font-medium">
-                  NPR {s.amount}
+                  NPR {Number(s.amount).toFixed(2)}
                 </Text>
               </View>
 

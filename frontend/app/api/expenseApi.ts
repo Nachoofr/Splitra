@@ -54,6 +54,7 @@ export interface Expense{
     date: string;
     category: number;
     splitMethod: string;
+
 }
 
 export const expenseApi = {
@@ -119,7 +120,8 @@ export const expenseApi = {
         amount: data.amount,
         category: data.category,
         splitMethod: data.splitMethod,
-        paidBy: data.paidBy
+        paidBy: data.paidBy,
+        splitRequest: data.splitRequest, 
       }
     );
     return response.data;
