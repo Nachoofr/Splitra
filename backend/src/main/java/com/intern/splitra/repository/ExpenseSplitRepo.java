@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ExpenseSplitRepo extends JpaRepository<ExpenseSplit, Long> {
-    ExpenseSplit deleteAllByExpenseId(long expenseId);
+    long deleteAllByExpenseId(long expenseId);
     List<ExpenseSplit> findAllByExpenseId(long expenseId);
     int countByUserIdId(long userId);
 }

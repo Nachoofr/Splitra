@@ -14,7 +14,6 @@ import com.intern.splitra.repository.ExpenseSplitRepo;
 import com.intern.splitra.repository.UserRepo;
 import com.intern.splitra.service.ExpenseSplitService;
 import lombok.AllArgsConstructor;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -71,7 +70,6 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
         }
 
         expenseSplitRepo.deleteAllByExpenseId(expenseId);
-
         expenseSplitRepo.saveAll(splitData);
 
         List<ExpenseSplitDto> splitDto = splitData.stream()
@@ -134,7 +132,6 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
         }
 
         expenseSplitRepo.deleteAllByExpenseId(expenseId);
-
         expenseSplitRepo.saveAll(splitData);
 
         List<ExpenseSplitDto> splitDto = splitData.stream()
@@ -183,8 +180,10 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
                 if (itemAmount == null)
                     throw new RuntimeException("Item index " + idx + " not found in items list");
 
-                long userCount = indexUserCountMap.get(idx);
-                userTotal += itemAmount / userCount;
+                long userCount = indexUserCountMap.getOrDefault(idx, 0L);
+                double share = (userCount == 0) ? 0.0 : (itemAmount / userCount);
+
+                userTotal += share;
             }
 
             userAmounts.merge(entry.getUserId(), userTotal, Double::sum);
@@ -214,10 +213,9 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
 
         return new ResponseEntity<>(
                 splitData.stream().map(expenseSplitMapper::toDto).toList(),
-                HttpStatus.OK);
+                HttpStatus.OK
+        );
     }
-
-
 
     public ResponseEntity<Map<String, Double>> getSplitDetails(long expenseId){
         List<ExpenseSplit> expenseSplits = expenseSplitRepo.findAllByExpenseId(expenseId);
@@ -232,6 +230,4 @@ public class ExpenseSplitServiceImpl implements ExpenseSplitService {
 
         return new ResponseEntity<>(splitDetails, HttpStatus.OK);
     }
-
-
 }

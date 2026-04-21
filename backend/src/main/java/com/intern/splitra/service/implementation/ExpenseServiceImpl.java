@@ -225,7 +225,10 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
         expenseRepo.save(expense);
-        activityService.logActivity(ActivityType.EXPENSE_UPDATED, group, user, expense.getDescription(), user.getFullName() + " updated an expense", expense.getAmount());
+
+        if (expenseDto.getSplitRequest() != null) {
+            expenseSplitService.splitExpense(expense, expenseDto.getSplitRequest(), user);
+        }
 
         return new ResponseEntity<>(expenseMapper.toDto(expense), HttpStatus.OK);
     }

@@ -32,9 +32,9 @@ public class GroupController {
     }
 
     @GetMapping(GroupApiEndpointConstants.GROUP_ID)
-    public ResponseEntity<GroupDto> getGroupById(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+    public ResponseEntity<GroupDto> getGroupById(@PathVariable long groupId, @AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId = userPrinciple.getUser().getId();
-        return groupService.getGroupById(id, userId);
+        return groupService.getGroupById(groupId, userId);
     }
 
     @PostMapping (GroupApiEndpointConstants.JOIN_GROUP)
@@ -44,20 +44,20 @@ public class GroupController {
     }
 
     @GetMapping(GroupApiEndpointConstants.GET_INVITE_LINK)
-    public ResponseEntity<String> getInviteLink(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+    public ResponseEntity<String> getInviteLink(@PathVariable long groupId, @AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId = userPrinciple.getUser().getId();
-        return groupService.getInviteLink(id, userId);
+        return groupService.getInviteLink(groupId, userId);
     }
 
     @GetMapping(GroupApiEndpointConstants.GROUP_MEMBERS)
-    public ResponseEntity<Long> getNumberOfMembers(@PathVariable long id) {
-        return groupService.getNumberOfMembers(id);
+    public ResponseEntity<Long> getNumberOfMembers(@PathVariable long groupId) {
+        return groupService.getNumberOfMembers(groupId);
     }
 
     @GetMapping(GroupApiEndpointConstants.GROUP_ID + "/members")
-    public ResponseEntity<List<GroupMemberDto>> getGroupMembers(@PathVariable long id, @AuthenticationPrincipal UserPrinciple userPrinciple) {
+    public ResponseEntity<List<GroupMemberDto>> getGroupMembers(@PathVariable long groupId, @AuthenticationPrincipal UserPrinciple userPrinciple) {
         long userId= userPrinciple.getUser().getId();
-        return groupService.getGroupMembers(id, userId);
+        return groupService.getGroupMembers(groupId, userId);
     }
 
     @DeleteMapping(GroupApiEndpointConstants.GROUP_ID + "/delete")

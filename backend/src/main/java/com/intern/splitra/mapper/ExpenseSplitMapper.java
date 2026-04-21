@@ -15,5 +15,6 @@ public interface ExpenseSplitMapper {
 
     @Mapping(source="expenseId", target="expense.id")
     @Mapping(source="userId", target="userId.id")
+    @Mapping(target = "amount", ignore = true)
     ExpenseSplit toEntity(ExpenseSplitDto expenseSplitDto);
 }

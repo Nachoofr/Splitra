@@ -8,10 +8,14 @@ import org.mapstruct.*;
 public interface UserMapper {
     UserDto toDto(User user);
 
+//    @Mapping(target ="user", ignore = true)
+@Mapping(target ="id", ignore = true)
+    @Mapping(target = "groups", ignore = true)
     User toEntity(UserDto userDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "qrCodes", ignore = true)
+    @Mapping(target = "groups", ignore = true)
     User update(UserDto userDto, @MappingTarget User user);
 }

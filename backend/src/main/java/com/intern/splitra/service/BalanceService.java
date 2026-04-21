@@ -9,4 +9,5 @@ import java.util.List;
 public interface BalanceService {
     ResponseEntity<List<BalanceDto>> getGroupBalance(long groupId);
     ResponseEntity<List<SettlementDto>> getSettlements (long groupId);
+    long getExpectedTransferAmount(long groupId, long fromUserId, long toUserId);
 }

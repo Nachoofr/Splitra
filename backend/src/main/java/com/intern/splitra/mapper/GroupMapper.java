@@ -11,9 +11,13 @@ public interface GroupMapper {
     GroupDto toDto(Groups group);
 
     @Mapping(target = "createdBy.id", source = "createdBy")
+    @Mapping(target = "customCategories", ignore = true)
     Groups toEntity(GroupDto groupDto);
     
     @Mapping(target = "createdBy.id", source = "createdBy")
+    @Mapping(target = "customCategories", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "members", ignore = true)
+    @Mapping(target = "activities", ignore = true)
     Groups update(GroupDto groupDto, @MappingTarget Groups group);
 }

@@ -10,10 +10,12 @@ import org.mapstruct.MappingTarget;
 public interface CategoryMapper {
 
     @Mapping(source="group.id", target="groupId")
+    @Mapping(target = "isGlobal", ignore=true)
     CategoryDto toDto(Category category);
 
     @Mapping(source="groupId", target="group.id")
     Category toEntity(CategoryDto categoryDto);
 
+    @Mapping(target = "group" , ignore = true)
     Category update(CategoryDto categoryDto, @MappingTarget Category category);
 }

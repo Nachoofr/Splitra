@@ -80,6 +80,31 @@ public class EsewaServiceImpl implements EsewaService {
                 "&total_amount=" + verifyDto.getTotalAmount();
 
         try {
+            // 1) Find settlement once
+            Settlement settlement = settlementRepo
+                    .findByTransactionId(verifyDto.getTransactionUuid())
+                    .orElseThrow(() -> new RuntimeException("Settlement not found"));
+
+            // 2) Must be pending
+            if (settlement.getStatus() != SettlementStatus.PENDING) {
+                throw new RuntimeException("Settlement already processed: " + settlement.getStatus());
+            }
+
+            // 3) Amount must match
+            double verifiedAmount;
+            try {
+                verifiedAmount = Double.parseDouble(verifyDto.getTotalAmount());
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Invalid totalAmount: " + verifyDto.getTotalAmount());
+            }
+
+            if (Math.abs(verifiedAmount - settlement.getAmount()) > 0.01) {
+                throw new RuntimeException(
+                        "Amount mismatch. Expected " + settlement.getAmount() + " but got " + verifiedAmount
+                );
+            }
+
+            // 4) Verify with eSewa
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
 
             if (response.getBody() == null) {
@@ -92,10 +117,7 @@ public class EsewaServiceImpl implements EsewaService {
                 throw new RuntimeException("Payment not completed. Status: " + status);
             }
 
-            Settlement settlement = settlementRepo
-                    .findByTransactionId(verifyDto.getTransactionUuid())
-                    .orElseThrow(() -> new RuntimeException("Settlement not found"));
-
+            // 5) Confirm using the same settlement
             settlement.setStatus(SettlementStatus.CONFIRMED);
             settlement.setConfirmedAt(LocalDateTime.now());
             settlementRepo.save(settlement);
