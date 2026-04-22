@@ -16,6 +16,9 @@ import CommonTitle from "../../../component/commonTitleGroups";
 import { useRouter } from "expo-router";
 import { userApi } from "../../api/userApi";
 import EditGroupModal from "../../../component/editGroupModal";
+import { expenseApi, Expense } from "../../api/expenseApi";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 
 const Settings = () => {
   const { group, refreshGroup } = useGroup();
@@ -25,6 +28,7 @@ const Settings = () => {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [EditModalVisible, setEditModalVisible] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
 
   useEffect(() => {
     if (group?.id) {
@@ -108,6 +112,85 @@ const Settings = () => {
       Alert.alert("Error", "Failed to share invite link.");
     } finally {
       setInviteLoading(false);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      setExportLoading(true);
+
+      const expenses: Expense[] = await expenseApi.getAllExpenses(group.id);
+
+      if (expenses.length === 0) {
+        Alert.alert("No Data", "There are no expenses to export.");
+        return;
+      }
+
+      const header = [
+        "ID",
+        "Description",
+        "Amount (NPR)",
+        "Category",
+        "Split Method",
+        "Created By",
+        "Paid By",
+        "Date",
+      ].join(",");
+
+      const rows = expenses.map((exp) => {
+        const paidBy = exp.paidBy
+          .map((p) => `${p.paidByUserName}(${p.amountPaid})`)
+          .join("; ");
+        const date = exp.date
+          ? new Date(exp.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })
+          : "";
+
+        const escape = (val: string | number) => {
+          const s = String(val ?? "");
+          if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+            return `"${s.replace(/"/g, '""')}"`;
+          }
+          return s;
+        };
+
+        return [
+          escape(exp.id),
+          escape(exp.description),
+          escape(exp.amount.toFixed(2)),
+          escape(exp.categoryName || ""),
+          escape(exp.splitMethod || ""),
+          escape(exp.createdByUsername || ""),
+          escape(paidBy),
+          escape(date),
+        ].join(",");
+      });
+
+      const csvContent = [header, ...rows].join("\n");
+
+      const fileName = `${group.groupName.replace(/[^a-zA-Z0-9]/g, "_")}_expenses.csv`;
+      const file = new FileSystem.File(FileSystem.Paths.document, fileName);
+
+      await file.write(csvContent);
+
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(file.uri, {
+          mimeType: "text/csv",
+          dialogTitle: `Export ${group.groupName} Expenses`,
+          UTI: "public.comma-separated-values-text",
+        });
+      } else {
+        Alert.alert("Error", "Sharing is not available on this device.");
+      }
+    } catch (err: any) {
+      console.error("Export error:", err);
+      Alert.alert("Error", "Failed to export expenses. Please try again.");
+    } finally {
+      setExportLoading(false);
     }
   };
 
@@ -208,20 +291,30 @@ const Settings = () => {
           <CommonTitle text={"Export Data"} />
 
           <Pressable
-            // onPress={handleExportCSV}
-            className="bg-white rounded-2xl px-5 py-4 flex-row items-center shadow-sm"
+            onPress={handleExportCSV}
+            disabled={exportLoading}
+            className="bg-white rounded-2xl px-5 py-4 flex-row items-center shadow-sm active:opacity-70"
           >
             <View className="w-12 h-12 rounded-full bg-blue-50 items-center justify-center mr-4">
-              <Ionicons name="download-outline" size={24} color="#3B82F6" />
+              {exportLoading ? (
+                <ActivityIndicator size="small" color="#3B82F6" />
+              ) : (
+                <Ionicons name="download-outline" size={24} color="#3B82F6" />
+              )}
             </View>
-            <View>
+            <View className="flex-1">
               <Text className="text-gray-900 text-lg font-medium">
                 Export to CSV
               </Text>
               <Text className="text-gray-400 text-sm">
-                Download all expenses
+                {exportLoading
+                  ? "Preparing export..."
+                  : "Download all expenses as spreadsheet"}
               </Text>
             </View>
+            {!exportLoading && (
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            )}
           </Pressable>
         </View>
 
