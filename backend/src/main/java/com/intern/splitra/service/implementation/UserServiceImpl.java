@@ -130,29 +130,24 @@ public class UserServiceImpl implements UserService {
                 .findTopByEmailAndPurposeAndUsedFalseOrderByExpiresAtDesc(email, "FORGOT_PASSWORD");
 
         if (optCode.isEmpty()) {
-            System.out.println("DEBUG: no unused code found for email=" + email);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         VerificationCode vc = optCode.get();
 
         if (vc.getExpiresAt().isBefore(LocalDateTime.now())) {
-            System.out.println("DEBUG: code expired for email=" + email);
             return new ResponseEntity<>(HttpStatus.GONE);
         }
 
         if (!vc.getCode().equals(code)) {
-            System.out.println("DEBUG: code mismatch. expected=" + vc.getCode() + " got=" + code);
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         User user = userRepo.findByEmail(email);
         if (user == null) {
-            System.out.println("DEBUG: user not found for email=" + email);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        System.out.println("DEBUG: all checks passed, resetting password");
         user.setPassword(encoder.encode(newPassword));
         userRepo.save(user);
 

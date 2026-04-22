@@ -19,7 +19,7 @@ public class Groups {
     private long id;
 
     @NotBlank
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String groupName;
 
     @Column(columnDefinition = "LONGTEXT")
