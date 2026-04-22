@@ -62,7 +62,6 @@ class ExpenseSplitServiceTest {
         expense.setGroup(group);
     }
 
-    // ─── itemwiseSplit() ──────────────────────────────────────────────────────────
 
     @Test
     void itemwiseSplit_WhenEntriesNull_ShouldThrow() {

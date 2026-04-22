@@ -68,7 +68,6 @@ class GroupServiceTest {
         group.setMembers(members);
     }
 
-    // ─── getGroupById() ──────────────────────────────────────────────────────────
 
     @Test
     void getGroupById_WhenGroupNotFound_ShouldThrow() {

@@ -137,6 +137,17 @@ class EsewaServiceTest {
     }
 
     @Test
+    void verifyPayment_WhenInvalidTotalAmountFormat_ShouldThrow() {
+        verifyDto.setTotalAmount("not-a-number");
+        when(settlementRepo.findByTransactionId("txn-uuid-abc")).thenReturn(Optional.of(pendingSettlement));
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> esewaService.verifyPayment(verifyDto));
+
+        assertTrue(ex.getMessage().contains("Invalid totalAmount"));
+    }
+
+    @Test
     void verifyPayment_WhenAllValid_ShouldConfirmSettlement() {
         when(settlementRepo.findByTransactionId("txn-uuid-abc")).thenReturn(Optional.of(pendingSettlement));
 
@@ -156,14 +167,5 @@ class EsewaServiceTest {
         verify(groupUtil).groupStatusUpdate(10L);
     }
 
-    @Test
-    void verifyPayment_WhenInvalidTotalAmountFormat_ShouldThrow() {
-        verifyDto.setTotalAmount("not-a-number");
-        when(settlementRepo.findByTransactionId("txn-uuid-abc")).thenReturn(Optional.of(pendingSettlement));
 
-        RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> esewaService.verifyPayment(verifyDto));
-
-        assertTrue(ex.getMessage().contains("Invalid totalAmount"));
-    }
 }
